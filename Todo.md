@@ -44,7 +44,7 @@
 * Exception handling (voorkom 500-foutmeldingen)
 * 20 commits
 * 5 pull requests + mergen naar main
-* Modellen met data constraints (bv NotNull, max. en min. value, ...)
+* Modellen met data constraints (bv NotNull, max. en min. value, ..)
 * Database met testdata via data.sql
 * validatie inkomende data
 * upload/download integratie

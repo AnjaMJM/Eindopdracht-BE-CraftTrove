@@ -17,11 +17,14 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, unique = true)
     private String title;
+    @Column(nullable = false)
     private String description;
     private String thumbnail;
     @ElementCollection
     private List<String> photos = new ArrayList<>();
+    @Column(nullable = false)
     private String pattern;
 //    @ManyToOne
 //    private Designer designer_id;
@@ -32,8 +35,13 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> categories;
-//    @ManyToMany
-//    private List<Keyword> keywords;
+    @ManyToMany
+    @JoinTable(
+            name = "product_keywords",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "keyword_id")
+    )
+    private List<Keyword> keywords;
 //    @ManyToMany
 //    private List<Purchase> purchases;
 //    @ManyToOne
