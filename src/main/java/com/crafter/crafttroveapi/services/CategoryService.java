@@ -1,6 +1,7 @@
 package com.crafter.crafttroveapi.services;
 
 import com.crafter.crafttroveapi.DTOs.CategoryOutputDTO;
+import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -32,15 +33,8 @@ public class CategoryService {
 
     public CategoryOutputDTO getCategoryByName(String name){
         Category category = categoryRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new IndexOutOfBoundsException("Category not found with name " + name));
+                .orElseThrow(() -> new RecordNotFoundException("Category not found with name " + name));
 
        return CategoryToOutput(category);
     }
-
-    public CategoryOutputDTO getCategoryById(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IndexOutOfBoundsException("Category not found"));
-        return CategoryToOutput(category);
-    }
-
 }
