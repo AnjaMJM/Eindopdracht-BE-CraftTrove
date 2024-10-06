@@ -45,6 +45,7 @@
 * 20 commits
 * 5 pull requests + mergen naar main
 * Modellen met data constraints (bv NotNull, max. en min. value, ..)
+  * Database constraints op entity (@Column()), Validation annotations in inputDTO's! (=technische keuze)
 * Database met testdata via data.sql
 * validatie inkomende data
 * upload/download integratie
