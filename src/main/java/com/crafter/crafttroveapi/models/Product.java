@@ -29,6 +29,8 @@ public class Product {
     @NotNull
     private String description;
 
+    private Double price;
+
     private String thumbnail;
 
     @ElementCollection
@@ -57,8 +59,13 @@ public class Product {
     )
     private List<Keyword> keywords;
 
-//    @ManyToMany
-//    private List<Purchase> purchases;
+    @ManyToMany
+    @JoinTable(
+            name = "products_purchased",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "purchase_id")
+    )
+    private List<Purchase> purchases;
 
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;

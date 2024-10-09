@@ -1,6 +1,7 @@
 package com.crafter.crafttroveapi.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertFalse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,7 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, )
     private Long id;
 
     private String username;
@@ -22,7 +23,7 @@ public class User {
 
     private String email;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_categories",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -30,4 +31,25 @@ public class User {
     ) //No user reference needed in category entity
     private List<Category> preferences;
 
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_purchases",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "purchase_id")
+            )
+    private List<Purchase> purchases;
+
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_wishlist",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> wishlist;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Review> reviews;
+
+    private Boolean isDesigner = false;
+    private Boolean isAdmin = false;
 }

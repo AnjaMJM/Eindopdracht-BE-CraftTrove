@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "reviews")
 @Getter
@@ -15,11 +17,9 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne
-//    private User user;
-//
-//    @ManyToOne
-//    private Designer designer;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
@@ -30,4 +30,6 @@ public class Review {
     private String text;
 
     private int rating;
+
+    private Date date;
 }
