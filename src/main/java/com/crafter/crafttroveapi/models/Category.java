@@ -14,8 +14,13 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
-    @ManyToMany(mappedBy = "categories")
+
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     private List<Product> products;
 }
