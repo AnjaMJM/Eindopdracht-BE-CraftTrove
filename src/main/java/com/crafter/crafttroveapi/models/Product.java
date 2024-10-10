@@ -1,14 +1,13 @@
 package com.crafter.crafttroveapi.models;
 
+import com.crafter.crafttroveapi.helpers.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 @Entity
 @Table(name = "products")
@@ -31,6 +30,8 @@ public class Product {
 
     private Double price;
 
+    private ProductStatus status;
+
     private String thumbnail;
 
     @ElementCollection
@@ -40,10 +41,11 @@ public class Product {
     @NotNull
     private String pattern;
 
-//    @ManyToOne
-//    private Designer designer_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "designer_id")
+    private Designer designer;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_categories",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -51,7 +53,7 @@ public class Product {
     )
     private List<Category> categories;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_keywords",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -59,7 +61,7 @@ public class Product {
     )
     private List<Keyword> keywords;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_purchased",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -67,7 +69,7 @@ public class Product {
     )
     private List<Purchase> purchases;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<Review> reviews;
 
 

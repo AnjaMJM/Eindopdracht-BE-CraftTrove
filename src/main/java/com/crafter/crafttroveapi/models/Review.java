@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Date;
 
@@ -25,8 +26,9 @@ public class Review {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @NotNull
+    @UniqueElements
     private String text;
 
     private int rating;

@@ -26,7 +26,7 @@ public class Purchase {
     @NotNull
     private Double totalPrice;
 
-    @ManyToMany(mappedBy = "purchases")
+    @ManyToMany(mappedBy = "purchases", fetch = FetchType.LAZY)
     private List<Product> products;
 
 

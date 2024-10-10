@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,6 +24,6 @@ public class Keyword {
 
     @Column(nullable = false)
     @NotNull
-    @ManyToMany(mappedBy = "keywords")
-    private List<Product> products = new ArrayList<>();
+    @ManyToMany(mappedBy = "keywords", fetch = FetchType.LAZY)
+    private List<Product> products;
 }

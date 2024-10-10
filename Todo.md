@@ -31,14 +31,16 @@
   * Designer
   * Admin
 * 6 Entiteiten (klassen)
-  * Product
-  * Account
-  * Review
-  * ShoppingCart
-  * Purchase
-  * User
+  ~~* Product~~
+ ~~* Review~~ 
+  ~~* Admin~~
+  ~~* Purchase~~
+  ~~* User~~
+  ~~* Keyword~~
+  ~~* Designer~~
+  ~~* Category~~
   * Security
-  * Wishlist?
+
 * 2 geslaagde integratietesten
 * 2 classes 100% coverage met unit-tests, gebruikmakend van de drie A's
 * Exception handling (voorkom 500-foutmeldingen)

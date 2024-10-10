@@ -14,7 +14,7 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String username;
@@ -47,9 +47,14 @@ public class User {
     )
     private List<Product> wishlist;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Review> reviews;
 
-    private Boolean isDesigner = false;
-    private Boolean isAdmin = false;
+    @OneToOne
+    @JoinColumn(name = "designer_id", referencedColumnName = "id")
+    private Designer isDesigner;
+
+    @OneToOne
+    @JoinColumn(name = "admin_id", referencedColumnName = "id")
+    private Admin isAdmin;
 }
