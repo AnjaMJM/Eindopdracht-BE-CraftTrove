@@ -1,6 +1,6 @@
 package com.crafter.crafttroveapi.services;
 
-import com.crafter.crafttroveapi.DTOs.CategoryOutputDTO;
+import com.crafter.crafttroveapi.DTOs.categoryDTO.CategoryOutputDTO;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.crafter.crafttroveapi.mappers.CategoryMapper.CategoryToOutput;
 
