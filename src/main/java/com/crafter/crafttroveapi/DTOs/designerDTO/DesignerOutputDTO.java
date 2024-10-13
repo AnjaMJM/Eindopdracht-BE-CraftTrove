@@ -16,8 +16,5 @@ public class DesignerOutputDTO {
 
     private String shopDescription;
 
-//    @OneToOne(mappedBy = "isDesigner")
-//    private UserOutputDTO user;
-
     private List<Long> productIdList;
 }

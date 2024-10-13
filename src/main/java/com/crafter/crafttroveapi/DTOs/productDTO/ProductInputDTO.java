@@ -2,6 +2,7 @@ package com.crafter.crafttroveapi.DTOs.productDTO;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.helpers.ProductStatus;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +14,10 @@ import java.util.List;
 @Setter
 public class ProductInputDTO {
 
-    @NotNull
-    @UniqueElements
+    @NotEmpty(message = "What name would you like to give your pattern?")
     private String title;
 
-    @NotNull
+    @NotEmpty(message = "Please add a description, so buyers know what to expect from your pattern")
     private String description;
 
     private Double price;
@@ -28,14 +28,16 @@ public class ProductInputDTO {
 
     private List<String> photos;
 
-    @NotNull
+    @NotEmpty(message = "Don't forget to upload a pattern")
     private String pattern;
 
-    private DesignerInputDTO designer;//many-to-one
+//    private DesignerInputDTO designer;//many-to-one
 
-    @NotNull
-    private List<Long> categoryIdList;
+    @NotEmpty(message = "Please select at least one category for you pattern")
+    private List<String> categoryList;
 
-    private List<Long> keywordIdList;
+    private List<String> keywordList;
+
+    private Boolean isAvailable;
 
 }

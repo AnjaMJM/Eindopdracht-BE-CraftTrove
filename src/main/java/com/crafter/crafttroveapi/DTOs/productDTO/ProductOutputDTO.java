@@ -21,7 +21,7 @@ public class ProductOutputDTO {
     private List<String> photos;
     private String pattern;
     private DesignerOutputDTO designer;
-    private List<Long> categoryIdList;
-    private List<Long> keywordIdList;
+    private List<String> categoryList;
+    private List<String> keywordList;
     private List<Long> reviewIdList;
 }

@@ -11,7 +11,6 @@ public class CategoryMapper {
 
     public static CategoryOutputDTO CategoryToOutput(Category category) {
         CategoryOutputDTO dto = new CategoryOutputDTO();
-        dto.setId(category.getId());
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
         if (category.getProducts() != null){

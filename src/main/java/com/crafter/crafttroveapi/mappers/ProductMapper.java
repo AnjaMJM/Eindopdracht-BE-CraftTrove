@@ -7,15 +7,29 @@ import com.crafter.crafttroveapi.models.Keyword;
 import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.models.Review;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
+import com.crafter.crafttroveapi.repositories.KeywordRepository;
+import com.crafter.crafttroveapi.services.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ProductMapper {
 
-    private static CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    public static ProductOutputDTO ProductToOutput(Product product) {
+    private final KeywordRepository keywordRepository;
+
+    @Autowired
+    public ProductMapper(CategoryRepository categoryRepository, KeywordRepository keywordRepository) {
+        this.categoryRepository = categoryRepository;
+        this.keywordRepository = keywordRepository;
+    }
+
+
+    public ProductOutputDTO ProductToOutput(Product product) {
         ProductOutputDTO dto = new ProductOutputDTO();
         dto.setId(product.getId());
         dto.setTitle(product.getTitle());
@@ -26,18 +40,18 @@ public class ProductMapper {
         dto.setPhotos(product.getPhotos());
 //        dto.setDesigner(DesignerMapper.DesignerToOutput(product.getDesigner()));
         if (product.getCategories() != null) {
-            List<Long> categoryIdList = new ArrayList<>();
+            List<String> categoryList = new ArrayList<>();
             for (Category category : product.getCategories()) {
-                categoryIdList.add(category.getId());
+                categoryList.add(category.getName());
             }
-            dto.setCategoryIdList(categoryIdList);
+            dto.setCategoryList(categoryList);
         }
         if (product.getKeywords() != null) {
-            List<Long> keywordIdList = new ArrayList<>();
+            List<String> keywordList = new ArrayList<>();
             for (Keyword keyword : product.getKeywords()) {
-                keywordIdList.add(keyword.getId());
+                keywordList.add(keyword.getName());
             }
-            dto.setKeywordIdList(keywordIdList);
+            dto.setKeywordList(keywordList);
         }
         if (product.getReviews() != null) {
             List<Long> reviewIdList = new ArrayList<>();
@@ -49,26 +63,45 @@ public class ProductMapper {
         return dto;
     }
 
-    public static Product InputToProduct(ProductInputDTO inputDTO) {
+    public Product InputToProduct(ProductInputDTO inputDTO) {
         Product product = new Product();
-        product.setTitle(product.getTitle());
-        product.setDescription(product.getDescription());
-        product.setPrice(product.getPrice());
-        product.setIsAvailable(product.getIsAvailable());
-        product.setThumbnail(product.getThumbnail());
-        product.setPhotos(product.getPhotos());
-//        dto.setDesigner(DesignerMapper.DesignerToOutput(product.getDesigner()));
-        if (inputDTO.getCategoryIdList() != null) {
-            List<Category> categories = categoryRepository.findAllById(inputDTO.getCategoryIdList());
+
+        product.setTitle(inputDTO.getTitle());
+        product.setDescription(inputDTO.getDescription());
+        product.setPrice(inputDTO.getPrice());
+        product.setIsAvailable(inputDTO.getIsAvailable());
+        product.setThumbnail(inputDTO.getThumbnail());
+        product.setPhotos(inputDTO.getPhotos());
+        product.setPattern(inputDTO.getPattern());
+//        dto.setDesigner(DesignerMapper.DesignerToOutput(inputDTO.getDesigner()));
+        if (inputDTO.getCategoryList() != null) {
+            List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
             product.setCategories(categories);
         }
-//        if (product.getKeywords() != null){
-//            List<Long> keywordIdList = new ArrayList<>();
-//            for (Keyword keyword: product.getKeywords()){
-//                keywordIdList.add(keyword.getId());
-//            }
-//            product.setKeywords(keywordIdList);
-//      }
+        if (inputDTO.getKeywordList() != null) {
+            List<Keyword> keywords = new ArrayList<>();
+            for (String keywordName : inputDTO.getKeywordList()) {
+                Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+                        .orElseGet(() -> {
+                            Keyword newKeyword = new Keyword();
+                            newKeyword.setName(keywordName);
+                            return keywordRepository.save(newKeyword);
+                        });
+                keywords.add(keyword);
+            }
+            product.setKeywords(keywords);
+        }
         return product;
+    }
+
+    public List<ProductOutputDTO> ListProductToOutput(List<Product> p) {
+        List<Product> products = new ArrayList<>(p);
+        List<ProductOutputDTO> outputList = new ArrayList<>();
+
+        for(Product product: products){
+            ProductOutputDTO output = ProductToOutput(product);
+            outputList.add(output);
+        }
+        return outputList;
     }
 }

@@ -3,6 +3,7 @@ package com.crafter.crafttroveapi.DTOs.designerDTO;
 import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.models.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,12 +15,10 @@ import java.util.List;
 @Setter
 public class DesignerInputDTO {
 
-    @NotNull
-    @UniqueElements
+    @NotEmpty(message = "What is your name? This may be the same as your username or you can choose something different if you prefer not to have your user activities linked to your shop")
     private String designerName;
 
-    @NotNull
-    @UniqueElements
+    @NotEmpty(message = "Your brand needs a name too.")
     private String brandName;
 
     private String shopDescription;
