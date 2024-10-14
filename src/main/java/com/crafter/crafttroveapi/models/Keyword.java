@@ -21,6 +21,6 @@ public class Keyword {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "keywords", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "keywords", fetch = FetchType.EAGER)
     private List<Product> products;
 }

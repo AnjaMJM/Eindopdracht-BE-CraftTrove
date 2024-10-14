@@ -17,13 +17,19 @@ VALUES
     (1003, 'Carol Smith', 'Smith Creations', 'Creating bold, unique crochet patterns and designs for enthusiasts.'),
     (1004, 'David Brown', 'Browns Weaving', 'Expert in woven designs and intricate patterns for traditional and modern styles.');
 
-INSERT INTO products (id, title, description, price, thumbnail, pattern, designer_id)
+INSERT INTO products (id, title, description, price, thumbnail, pattern, designer_id, is_available)
 VALUES
-    (1001, 'Classic Cable Knit Sweater', 'A cozy, classic cable knit sweater pattern perfect for winter wear.', 49.99, 'thumb1.jpg', 'Cable Knit', 1001),
-    (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag with modern aesthetics.', 29.99, 'thumb2.jpg', 'Crochet', 1003),
-    (1003, 'Modern Weave Wall Hanging', 'A decorative woven wall hanging with a mix of textures and colors.', 79.99, 'thumb3.jpg', 'Weaving', 1004),
-    (1004, 'Stitchwork Scarf', 'A warm, stitchwork scarf designed for comfort and style.', 19.99, 'thumb4.jpg', 'Knitting', 1002),
-    (1005, 'Summer Lace Shawl', 'A light lace shawl pattern perfect for warm evenings and special occasions.', 34.99, 'thumb5.jpg', 'Lace', 1001);
+    (1001, 'Classic Cable Knit Sweater', 'A cozy, classic cable knit sweater pattern perfect for winter wear.', 49.99, 'thumb1.jpg', 'Cable Knit', 1001, false),
+    (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag with modern aesthetics.', 29.99, 'thumb2.jpg', 'Crochet', 1003, true),
+    (1003, 'Modern Weave Wall Hanging', 'A decorative woven wall hanging with a mix of textures and colors.', 79.99, 'thumb3.jpg', 'Weaving', 1004, false),
+    (1004, 'Stitchwork Scarf', 'A warm, stitchwork scarf designed for comfort and style.', 19.99, 'thumb4.jpg', 'Knitting', 1002, true),
+    (1005, 'Summer Lace Shawl', 'A light lace shawl pattern perfect for warm evenings and special occasions.', 34.99, 'thumb5.jpg', 'Lace', 1001, true);
+
+INSERT INTO keywords (id, name)
+VALUES
+(1001, 'sweater'),
+(1002, 'winter'),
+(1003, 'bag');
 
 INSERT INTO products_categories (product_id, category_id)
 VALUES
@@ -45,3 +51,10 @@ VALUES
 -- Product 5: Summer Lace Shawl (Lace, Knitting)
 (1005, 5),
 (1005, 2);
+
+INSERT INTO products_keywords (product_id, keyword_id)
+VALUES
+(1001, 1001),
+(1001, 1002),
+(1002, 1003),
+(1004, 1002);

@@ -2,8 +2,10 @@ package com.crafter.crafttroveapi.services;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
+import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
+import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.models.Keyword;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,8 +40,9 @@ public class ProductService {
         this.productMapper = productMapper;
     }
 
+
     public List<ProductOutputDTO> getAllProducts() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findAllAvailableProducts();
         List<ProductOutputDTO> dtos = new ArrayList<>();
 
         for (Product product : products) {
@@ -47,13 +51,15 @@ public class ProductService {
         return dtos;
     }
 
-    public ProductOutputDTO getProductById(Long id){
-        Product product = productRepository.findById(id)
+    @CheckAvailability
+    public ProductOutputDTO getProductById(Long productId){
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RecordNotFoundException("Product not found"));
 
         return productMapper.ProductToOutput(product);
     }
 
+    @CheckAvailability(type = CheckType.CATEGORY)
     public List<ProductOutputDTO> getProductsByCategory(String categoryName) {
         Category category = categoryRepository.findByNameIgnoreCase(categoryName)
                 .orElseThrow(() -> new RecordNotFoundException("Category with categoryName " + categoryName + " not found"));
@@ -61,6 +67,7 @@ public class ProductService {
         return productMapper.ListProductToOutput(category.getProducts());
     }
 
+    @CheckAvailability(type = CheckType.KEYWORD)
     public List<ProductOutputDTO> getProductsByKeywords(String keywordName) {
         Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
                 .orElseThrow(() -> new RecordNotFoundException("Keyword " + keywordName + " is not found"));
@@ -78,21 +85,22 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductOutputDTO deleteProduct(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+    @CheckAvailability
+    public ProductOutputDTO deleteProduct(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
         if(optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
 
             List<Keyword> keywords = product.getKeywords();
             for (Keyword keyword:keywords) {
-                List<Product> otherProductsWithKeyword = productRepository.findByKeyword(keyword);
-                if (otherProductsWithKeyword.size() == 1) { // Only attached to the current product
+                List<Product> otherProductsWithKeyword = productRepository.findByKeywords(keyword);
+                if (otherProductsWithKeyword.size() == 1) {
                     keywordRepository.delete(keyword);
                 }
             }
             product.setIsAvailable(false);
 
         }
-        throw new RecordNotFoundException("Product with id " + id + " not found");
+        throw new RecordNotFoundException("Product with productId " + productId + " not found");
     }
 }
