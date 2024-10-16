@@ -22,8 +22,6 @@ public class ProductInputDTO {
 
     private Double price;
 
-    private ProductStatus status;
-
     private String thumbnail;
 
     private List<String> photos;

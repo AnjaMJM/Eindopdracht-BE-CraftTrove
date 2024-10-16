@@ -85,6 +85,59 @@ public class ProductService {
         return productMapper.ProductToOutput(p);
     }
 
+    @CheckAvailability
+    public ProductOutputDTO updateProduct(Long id, ProductInputDTO updatedProduct) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            Product existingProduct = product.get();
+
+            if (updatedProduct.getTitle() != null) {
+                existingProduct.setTitle(updatedProduct.getTitle());
+            }
+            if (updatedProduct.getDescription() != null) {
+                existingProduct.setDescription(updatedProduct.getDescription());
+            }
+            if (updatedProduct.getPrice() != null) {
+                existingProduct.setPrice(updatedProduct.getPrice());
+            }
+            if (updatedProduct.getThumbnail() != null) {
+                existingProduct.setThumbnail(updatedProduct.getThumbnail());
+            }
+            if (updatedProduct.getPhotos() != null) {
+                existingProduct.setPhotos(updatedProduct.getPhotos());
+            }
+            if (updatedProduct.getPattern() != null) {
+                existingProduct.setPattern(updatedProduct.getPattern());
+            }
+            if (updatedProduct.getCategoryList() != null) {
+                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
+                existingProduct.setCategories(categories);
+            }
+            if (updatedProduct.getKeywordList() != null) {
+                List<Keyword> keywords = new ArrayList<>();
+                for (String keywordName : updatedProduct.getKeywordList()) {
+                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+                            .orElseGet(() -> {
+                                Keyword newKeyword = new Keyword();
+                                newKeyword.setName(keywordName);
+                                return keywordRepository.save(newKeyword);
+                            });
+                    keywords.add(keyword);
+                }
+                existingProduct.setKeywords(keywords);
+            }
+            if (updatedProduct.getIsAvailable() != null) {
+                existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
+            }
+            Product savedProduct = productRepository.save(existingProduct);
+            return productMapper.ProductToOutput(savedProduct);
+        } else {
+            throw new RecordNotFoundException("This product does not exist");
+        }
+    }
+
+
+
     @Transactional
     @CheckAvailability
     public void deleteProduct(Long productId) {
