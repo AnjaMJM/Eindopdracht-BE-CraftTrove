@@ -19,11 +19,8 @@ public class Keyword {
     private Long id;
 
     @Column(unique = true)
-    @UniqueElements
     private String name;
 
-    @Column(nullable = false)
-    @NotNull
-    @ManyToMany(mappedBy = "keywords", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "keywords", fetch = FetchType.EAGER)
     private List<Product> products;
 }

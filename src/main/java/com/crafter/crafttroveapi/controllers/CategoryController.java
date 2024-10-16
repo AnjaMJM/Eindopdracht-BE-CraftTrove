@@ -1,6 +1,6 @@
 package com.crafter.crafttroveapi.controllers;
 
-import com.crafter.crafttroveapi.DTOs.CategoryOutputDTO;
+import com.crafter.crafttroveapi.DTOs.categoryDTO.CategoryOutputDTO;
 import com.crafter.crafttroveapi.services.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

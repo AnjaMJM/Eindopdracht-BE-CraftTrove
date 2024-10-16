@@ -20,17 +20,15 @@ public class Product {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @NotNull
-    @UniqueElements
     private String title;
 
     @Column(nullable = false)
-    @NotNull
     private String description;
 
     private Double price;
 
-    private ProductStatus status;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean isAvailable;
 
     private String thumbnail;
 
@@ -38,13 +36,13 @@ public class Product {
     private List<String> photos;
 
     @Column(nullable = false)
-    @NotNull
     private String pattern;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "designer_id")
     private Designer designer;
 
+    @Column(nullable = false)
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_categories",
@@ -53,7 +51,7 @@ public class Product {
     )
     private List<Category> categories;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_keywords",
             joinColumns = @JoinColumn(name = "product_id"),

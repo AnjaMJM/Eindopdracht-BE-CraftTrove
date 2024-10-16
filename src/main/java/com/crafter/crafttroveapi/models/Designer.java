@@ -12,29 +12,23 @@ import java.util.List;
 @Table(name = "designers")
 @Getter
 @Setter
-public class Designer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Designer extends User {
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
 
     @Column(nullable = false, unique = true)
-    @NotNull
-    @UniqueElements
     private String designerName;
 
     @Column(nullable = false, unique = true)
-    @NotNull
-    @UniqueElements
     private String brandName;
 
-    private String shopDescription;
+    private String brandLogo;
 
-    @OneToOne(mappedBy = "isDesigner")
-    private User user;
+    private String brandDescription;
 
     @OneToMany(mappedBy = "designer", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Product> products;
-
 
 }

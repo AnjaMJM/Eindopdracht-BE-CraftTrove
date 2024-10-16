@@ -1,14 +1,16 @@
 package com.crafter.crafttroveapi.services;
 
-import com.crafter.crafttroveapi.DTOs.CategoryOutputDTO;
+import com.crafter.crafttroveapi.DTOs.categoryDTO.CategoryOutputDTO;
+import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
+import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.models.Category;
+import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.crafter.crafttroveapi.mappers.CategoryMapper.CategoryToOutput;
 
@@ -26,11 +28,15 @@ public class CategoryService {
         List<CategoryOutputDTO> dtos = new ArrayList<>();
 
         for(Category category:categories) {
-            dtos.add(CategoryToOutput(category));
+            if(category.getProducts().stream()
+                    .anyMatch(Product::getIsAvailable)) {
+                dtos.add(CategoryToOutput(category));
+            }
         }
         return dtos;
     }
 
+    @CheckAvailability(type = CheckType.CATEGORY)
     public CategoryOutputDTO getCategoryByName(String name){
         Category category = categoryRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new RecordNotFoundException("Category not found with name " + name));

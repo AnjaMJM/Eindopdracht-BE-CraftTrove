@@ -8,13 +8,14 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "users")
 @Getter
 @Setter
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String username;
@@ -36,7 +37,7 @@ public class User {
             name = "user_purchases",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "purchase_id")
-            )
+    )
     private List<Purchase> purchases;
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
@@ -50,11 +51,4 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Review> reviews;
 
-    @OneToOne
-    @JoinColumn(name = "designer_id", referencedColumnName = "id")
-    private Designer isDesigner;
-
-    @OneToOne
-    @JoinColumn(name = "admin_id", referencedColumnName = "id")
-    private Admin isAdmin;
 }
