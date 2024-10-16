@@ -51,7 +51,7 @@ public class Product {
     )
     private List<Category> categories;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_keywords",
             joinColumns = @JoinColumn(name = "product_id"),

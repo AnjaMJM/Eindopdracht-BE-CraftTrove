@@ -13,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByTitleIgnoreCase(String title);
 
-    List<Product> findByKeywords(Keyword keyword);
+    List<Product> findByKeywords(List<Keyword> keywords);
     @Query("SELECT p FROM Product p WHERE p.isAvailable = true")
     List<Product> findAllAvailableProducts();
 

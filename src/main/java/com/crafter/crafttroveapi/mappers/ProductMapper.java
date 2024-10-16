@@ -100,7 +100,9 @@ public class ProductMapper {
 
         for(Product product: products){
             ProductOutputDTO output = ProductToOutput(product);
-            outputList.add(output);
+            if(product.getIsAvailable()) {
+                outputList.add(output);
+            }
         }
         return outputList;
     }

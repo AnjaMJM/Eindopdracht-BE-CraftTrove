@@ -15,12 +15,13 @@ import com.crafter.crafttroveapi.repositories.KeywordRepository;
 import com.crafter.crafttroveapi.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -52,7 +53,7 @@ public class ProductService {
     }
 
     @CheckAvailability
-    public ProductOutputDTO getProductById(Long productId){
+    public ProductOutputDTO getProductById(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RecordNotFoundException("Product not found"));
 
@@ -76,7 +77,7 @@ public class ProductService {
     }
 
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
-        if(productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
+        if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
 
@@ -86,21 +87,15 @@ public class ProductService {
 
     @Transactional
     @CheckAvailability
-    public ProductOutputDTO deleteProduct(Long productId) {
+    public void deleteProduct(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
-        if(optionalProduct.isPresent()) {
+        if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
 
-            List<Keyword> keywords = product.getKeywords();
-            for (Keyword keyword:keywords) {
-                List<Product> otherProductsWithKeyword = productRepository.findByKeywords(keyword);
-                if (otherProductsWithKeyword.size() == 1) {
-                    keywordRepository.delete(keyword);
-                }
-            }
             product.setIsAvailable(false);
 
+        } else {
+            throw new RecordNotFoundException("Product with productId " + productId + " not found");
         }
-        throw new RecordNotFoundException("Product with productId " + productId + " not found");
     }
 }

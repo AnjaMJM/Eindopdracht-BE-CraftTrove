@@ -16,8 +16,9 @@ public class CategoryMapper {
         if (category.getProducts() != null){
             List<Long> productIdList = new ArrayList<>();
             for(Product product:category.getProducts()){
-                //add productId to productIdList
-                productIdList.add(product.getId());
+                if(product.getIsAvailable()) {
+                    productIdList.add(product.getId());
+                }
             }
             dto.setProductIdList(productIdList);
         }
