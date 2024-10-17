@@ -2,9 +2,12 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
+import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
+import com.crafter.crafttroveapi.DTOs.validation.UpdateGroup;
 import com.crafter.crafttroveapi.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -41,7 +44,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody @Valid ProductInputDTO newProduct) {
+    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody @Validated(CreateGroup.class) ProductInputDTO newProduct) {
         ProductOutputDTO createdProduct = productService.createNewProduct(newProduct);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -49,6 +52,12 @@ public class ProductController {
                 .buildAndExpand(createdProduct.getId())
                 .toUri();
         return ResponseEntity.created(location).body(createdProduct);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @RequestBody @Validated(UpdateGroup.class) ProductInputDTO updatedProduct){
+        ProductOutputDTO update = productService.updateProduct(id, updatedProduct);
+        return ResponseEntity.ok(update);
     }
 
     @DeleteMapping("/{id}")

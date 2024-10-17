@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductMapper {
@@ -28,7 +29,6 @@ public class ProductMapper {
         this.keywordRepository = keywordRepository;
     }
 
-
     public ProductOutputDTO ProductToOutput(Product product) {
         ProductOutputDTO dto = new ProductOutputDTO();
         dto.setId(product.getId());
@@ -37,6 +37,7 @@ public class ProductMapper {
         dto.setPrice(product.getPrice());
         dto.setIsAvailable(product.getIsAvailable());
         dto.setThumbnail(product.getThumbnail());
+        dto.setPattern(product.getPattern());
         dto.setPhotos(product.getPhotos());
 //        dto.setDesigner(DesignerMapper.DesignerToOutput(product.getDesigner()));
         if (product.getCategories() != null) {
@@ -98,12 +99,57 @@ public class ProductMapper {
         List<Product> products = new ArrayList<>(p);
         List<ProductOutputDTO> outputList = new ArrayList<>();
 
-        for(Product product: products){
+        for (Product product : products) {
             ProductOutputDTO output = ProductToOutput(product);
-            if(product.getIsAvailable()) {
+            if (product.getIsAvailable()) {
                 outputList.add(output);
             }
         }
         return outputList;
     }
+
+//    public Product UpdatedInputToProduct(ProductInputDTO updatedInput) {
+//        Optional<Product> product = productRepository.findById(id);
+//        if (product.isPresent()) {
+//            Product existingProduct = product.get();
+//
+//            if (updatedInput.getTitle() != null) {
+//                existingProduct.setTitle(updatedInput.getTitle());
+//            }
+//            if (updatedInput.getDescription() != null) {
+//                existingProduct.setDescription(updatedInput.getDescription());
+//            }
+//            if (updatedInput.getPrice() != null) {
+//                existingProduct.setPrice(updatedInput.getPrice());
+//            }
+//            if (updatedInput.getThumbnail() != null) {
+//                existingProduct.setThumbnail(updatedInput.getThumbnail());
+//            }
+//            if (updatedInput.getPhotos() != null) {
+//                existingProduct.setPhotos(updatedInput.getPhotos());
+//            }
+//            if (updatedInput.getPattern() != null) {
+//                existingProduct.setPattern(updatedInput.getPattern());
+//            }
+//            if (updatedInput.getCategoryList() != null) {
+//                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedInput.getCategoryList());
+//                existingProduct.setCategories(categories);
+//            }
+//            if (updatedInput.getKeywordList() != null) {
+//                List<Keyword> keywords = new ArrayList<>();
+//                for (String keywordName : updatedInput.getKeywordList()) {
+//                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+//                            .orElseGet(() -> {
+//                                Keyword newKeyword = new Keyword();
+//                                newKeyword.setName(keywordName);
+//                                return keywordRepository.save(newKeyword);
+//                            });
+//                    keywords.add(keyword);
+//                }
+//                existingProduct.setKeywords(keywords);
+//            }
+//            if (updatedInput.getIsAvailable() != null) {
+//                existingProduct.setIsAvailable(updatedInput.getIsAvailable());
+//            }
 }
+

@@ -15,8 +15,6 @@ import com.crafter.crafttroveapi.repositories.KeywordRepository;
 import com.crafter.crafttroveapi.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -80,7 +78,6 @@ public class ProductService {
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
-
         Product p = productRepository.save(productMapper.InputToProduct(newProduct));
         return productMapper.ProductToOutput(p);
     }
@@ -91,8 +88,15 @@ public class ProductService {
         if (product.isPresent()) {
             Product existingProduct = product.get();
 
+// designer stays the same. check if needs to be added to list
             if (updatedProduct.getTitle() != null) {
-                existingProduct.setTitle(updatedProduct.getTitle());
+
+                if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
+                    throw new DuplicateRecordException("A product with this name already exists");
+                } else {
+                    existingProduct.setTitle(updatedProduct.getTitle());
+                }
+
             }
             if (updatedProduct.getDescription() != null) {
                 existingProduct.setDescription(updatedProduct.getDescription());
@@ -135,7 +139,6 @@ public class ProductService {
             throw new RecordNotFoundException("This product does not exist");
         }
     }
-
 
 
     @Transactional
