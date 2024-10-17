@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertFalse;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 
 import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "users")
+@Check(constraints = "email LIKE '%@%'")
 @Getter
 @Setter
 public class User {
@@ -18,10 +20,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false, unique = true)
     private String password;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
@@ -29,7 +34,7 @@ public class User {
             name = "user_categories",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
-    ) //No user reference needed in category entity
+    )
     private List<Category> preferences;
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
@@ -50,5 +55,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Review> reviews;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isDesigner;
 
 }
