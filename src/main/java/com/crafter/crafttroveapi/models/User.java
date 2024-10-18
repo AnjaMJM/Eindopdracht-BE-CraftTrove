@@ -56,7 +56,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Review> reviews;
 
-    @Column(columnDefinition = "boolean default false")
     private Boolean isDesigner;
 
 }

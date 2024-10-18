@@ -8,13 +8,11 @@ import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.models.Review;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
 import com.crafter.crafttroveapi.repositories.KeywordRepository;
-import com.crafter.crafttroveapi.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductMapper {
@@ -23,10 +21,13 @@ public class ProductMapper {
 
     private final KeywordRepository keywordRepository;
 
+    private final DesignerMapper designerMapper;
+
     @Autowired
-    public ProductMapper(CategoryRepository categoryRepository, KeywordRepository keywordRepository) {
+    public ProductMapper(CategoryRepository categoryRepository, KeywordRepository keywordRepository, DesignerMapper designerMapper) {
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
+        this.designerMapper = designerMapper;
     }
 
     public ProductOutputDTO ProductToOutput(Product product) {
@@ -39,7 +40,7 @@ public class ProductMapper {
         dto.setThumbnail(product.getThumbnail());
         dto.setPattern(product.getPattern());
         dto.setPhotos(product.getPhotos());
-//        dto.setDesigner(DesignerMapper.DesignerToOutput(product.getDesigner()));
+        dto.setDesigner(designerMapper.DesignerToOutput(product.getDesigner()));
         if (product.getCategories() != null) {
             List<String> categoryList = new ArrayList<>();
             for (Category category : product.getCategories()) {

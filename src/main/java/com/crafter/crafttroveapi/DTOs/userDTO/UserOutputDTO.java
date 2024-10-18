@@ -13,7 +13,7 @@ public class UserOutputDTO {
     private String email;
     private List<String> categoryPreferences;
     private List<String> productWishlist;
-    private List<String> purchases;
+    private List<Long> purchases;
     private List<String> reviews;
     private Boolean isDesigner;
 }

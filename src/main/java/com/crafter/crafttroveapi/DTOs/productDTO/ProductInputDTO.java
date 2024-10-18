@@ -1,14 +1,10 @@
 package com.crafter.crafttroveapi.DTOs.productDTO;
 
-import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
-import com.crafter.crafttroveapi.helpers.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.List;
 
