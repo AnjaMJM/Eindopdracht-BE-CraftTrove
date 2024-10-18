@@ -13,13 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Designer extends User {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String designerName;
 
     @Column(nullable = false, unique = true)
     private String brandName;

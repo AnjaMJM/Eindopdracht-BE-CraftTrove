@@ -10,12 +10,19 @@ VALUES (1, 'Sewing', 'The craft of fastening or attaching objects using stitches
        (9, 'Felt', 'A technique for creating fabric from wool or other fibers using heat, moisture, and pressure. Felt is used for making accessories, home decor, and craft items.'),
        (10, 'Weaving', 'The process of interlacing threads or yarns on a loom to create fabric. Weaving is used for making garments, rugs, and textiles.');
 
-INSERT INTO designers (id, designer_name, brand_name, brand_description)
+INSERT INTO users (id, username, password, email)
 VALUES
-    (1001, 'Alice Walker', 'Walkers Knits', 'A creative knitwear designer specializing in modern and classic patterns.'),
-    (1002, 'Bob Johnson', 'Bobs Stitchworks', 'Specializes in functional, everyday clothing designs with a touch of creativity.'),
-    (1003, 'Carol Smith', 'Smith Creations', 'Creating bold, unique crochet patterns and designs for enthusiasts.'),
-    (1004, 'David Brown', 'Browns Weaving', 'Expert in woven designs and intricate patterns for traditional and modern styles.');
+    (1001, 'alicewalker', 'securePassword123', 'alice@walkersknits.com'),
+    (1002, 'bobjohnson', 'securePassword456', 'bob@stitchworks.com'),
+    (1003, 'carolsmith', 'securePassword789', 'carol@smithcreations.com'),
+    (1004, 'davidbrown', 'securePassword101', 'david@brownsweaving.com');
+
+INSERT INTO designers (id, username, password, email, brand_name, brand_logo, brand_description)
+VALUES
+    (1001, 'alicewalker', 'securePassword123', 'alice@walkersknits.com', 'Walkers Knits', 'logo1.png', 'A creative knitwear designer specializing in modern and classic patterns.'),
+    (1002, 'bobjohnson', 'securePassword456', 'bob@stitchworks.com', 'Bobs Stitchworks', 'logo2.png', 'Specializes in functional, everyday clothing designs with a touch of creativity.'),
+    (1003, 'carolsmith', 'securePassword789', 'carol@smithcreations.com', 'Smith Creations', 'logo3.png', 'Creating bold, unique crochet patterns and designs for enthusiasts.'),
+    (1004, 'davidbrown', 'securePassword101', 'david@brownsweaving.com', 'Browns Weaving', 'logo4.png', 'Expert in woven designs and intricate patterns for traditional and modern styles.');
 
 INSERT INTO products (id, title, description, price, thumbnail, pattern, designer_id, is_available)
 VALUES

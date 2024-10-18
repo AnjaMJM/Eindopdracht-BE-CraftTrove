@@ -58,13 +58,14 @@ public class UserMapper {
         return user;
     }
 
-    public User wishlistInputToUser(UserInputDTO inputDTO) {
-        // would this method work to add items to wishlist?
-        User user = new User();
-        if (inputDTO.getProductWishlist() != null) {
-            List<Product> products = productRepository.findByTitle(inputDTO.getProductWishlist());
-            user.setWishlist(products);
-        }
-        return user;
-    }
+    // methode werkt nog niet!
+//    public User wishlistInputToUser(UserInputDTO inputDTO) {
+//        // would this method work to add items to wishlist?
+//        User user = new User();
+//        if (inputDTO.getProductWishlist() != null) {
+//            List<Product> products = productRepository.findByTitle(String.valueOf(inputDTO.getProductWishlist()));
+//            user.setWishlist(products);
+//        }
+//        return user;
+//    }
 }

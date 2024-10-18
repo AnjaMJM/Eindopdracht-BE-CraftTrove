@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Check;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -58,4 +60,14 @@ public class User {
 
     private Boolean isDesigner;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    private Boolean isExpired;
+    private Boolean isLocked;
+    private Boolean areCredentialsExpired;
+    private Boolean isEnabled;
 }

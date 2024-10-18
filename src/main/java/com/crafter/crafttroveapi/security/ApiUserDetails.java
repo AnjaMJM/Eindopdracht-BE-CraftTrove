@@ -1,5 +1,6 @@
 package com.crafter.crafttroveapi.security;
 
+import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,16 +24,16 @@ public class ApiUserDetails implements UserDetails {
         user.setUsername(username);
 
         for (String role : roles) {
-            user.getRoles().add(new RoleModel(role));
+            user.getRoles().add(new Role());
         }
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (RoleModel role: user.getRoles()) {
+        for (Role role: user.getRoles()) {
             if(role.isActive()) {
-                authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+                authorities.add(new SimpleGrantedAuthority(String.valueOf(role.getName())));
             }
         }
         return authorities;
@@ -45,25 +46,25 @@ public class ApiUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return  user.getId() + "::" + user.getUserName();
+        return  user.getId() + "::" + user.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return !user.isExpired();
+        return !user.getIsExpired();
     }
     @Override
     public boolean isAccountNonLocked() {
-        return !user.isLocked();
+        return !user.getIsLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return !user.areCredentialsExpired();
+        return !user.getAreCredentialsExpired();
     }
 
     @Override
     public boolean isEnabled() {
-        return user.isEnabled();
+        return user.getIsEnabled();
     }
 }
