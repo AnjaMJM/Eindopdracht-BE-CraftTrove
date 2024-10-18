@@ -25,6 +25,7 @@ public class UserMapper {
 
     public UserOutputDTO userToOutput(User user) {
         UserOutputDTO dto = new UserOutputDTO();
+        dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         if (user.getPreferences() != null) {
