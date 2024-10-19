@@ -39,12 +39,7 @@ public class User {
     )
     private List<Category> preferences;
 
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_purchases",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "purchase_id")
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Purchase> purchases;
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

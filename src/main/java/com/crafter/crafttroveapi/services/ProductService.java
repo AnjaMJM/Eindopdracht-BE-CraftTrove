@@ -45,7 +45,7 @@ public class ProductService {
         List<ProductOutputDTO> dtos = new ArrayList<>();
 
         for (Product product : products) {
-            dtos.add(productMapper.ProductToOutput(product));
+            dtos.add(productMapper.productToOutput(product));
         }
         return dtos;
     }
@@ -55,7 +55,7 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RecordNotFoundException("Product not found"));
 
-        return productMapper.ProductToOutput(product);
+        return productMapper.productToOutput(product);
     }
 
     @CheckAvailability(type = CheckType.CATEGORY)
@@ -78,8 +78,8 @@ public class ProductService {
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
-        Product p = productRepository.save(productMapper.InputToProduct(newProduct));
-        return productMapper.ProductToOutput(p);
+        Product p = productRepository.save(productMapper.inputToProduct(newProduct));
+        return productMapper.productToOutput(p);
     }
 
     @CheckAvailability
@@ -134,7 +134,7 @@ public class ProductService {
                 existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
             }
             Product savedProduct = productRepository.save(existingProduct);
-            return productMapper.ProductToOutput(savedProduct);
+            return productMapper.productToOutput(savedProduct);
         } else {
             throw new RecordNotFoundException("This product does not exist");
         }

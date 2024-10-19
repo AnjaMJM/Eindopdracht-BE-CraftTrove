@@ -1,11 +1,11 @@
 package com.crafter.crafttroveapi.controllers;
 
+import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
 import com.crafter.crafttroveapi.DTOs.validation.UpdateGroup;
-import com.crafter.crafttroveapi.services.ProductService;
-import jakarta.validation.Valid;
+import com.crafter.crafttroveapi.services.DesignerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,32 +16,24 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
-public class ProductController {
+public class DesignerController {
 
-    private final ProductService productService;
+    private final DesignerService designerService;
 
     @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    public DesignerController(DesignerService designerService) {
+        this.designerService = designerService;
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductOutputDTO>> getAllProducts(
-            @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "keyword", required = false) String keyword
-    ){
-        if (category != null) {
-            return ResponseEntity.ok(productService.getProductsByCategory(category));
-        }
-        if (keyword != null) {
-            return ResponseEntity.ok(productService.getProductsByKeywords(keyword));
-        }
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<DesignerOutputDTO>> getAllDesigners(){
+
+
+        return ResponseEntity.ok(designerService.getAllDesigners());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> getProductById(@PathVariable ("id") Long id) {
+    public ResponseEntity<ProductOutputDTO> getProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 

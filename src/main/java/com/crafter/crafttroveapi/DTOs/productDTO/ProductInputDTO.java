@@ -28,8 +28,6 @@ public class ProductInputDTO {
     @NotEmpty(groups = CreateGroup.class, message = "Don't forget to upload a pattern")
     private String pattern;
 
-//    private DesignerInputDTO designer;//many-to-one
-
     @NotEmpty(groups = CreateGroup.class, message = "Please select at least one category for you pattern")
     private List<String> categoryList;
 

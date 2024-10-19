@@ -22,13 +22,12 @@ public class Review {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
     @Column(nullable = false, unique = true)
-    @NotNull
-    @UniqueElements
+
     private String text;
 
     private int rating;

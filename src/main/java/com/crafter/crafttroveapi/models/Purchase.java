@@ -18,15 +18,18 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     @Column(nullable = false)
-    @NotNull
     private Date date;
 
     @Column(nullable = false)
-    @NotNull
     private Double totalPrice;
 
     @ManyToMany(mappedBy = "purchases", fetch = FetchType.LAZY)
+    @Column(nullable = false)
     private List<Product> products;
 
 

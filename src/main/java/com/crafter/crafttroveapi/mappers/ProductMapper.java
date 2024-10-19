@@ -30,7 +30,7 @@ public class ProductMapper {
         this.designerMapper = designerMapper;
     }
 
-    public ProductOutputDTO ProductToOutput(Product product) {
+    public ProductOutputDTO productToOutput(Product product) {
         ProductOutputDTO dto = new ProductOutputDTO();
         dto.setId(product.getId());
         dto.setTitle(product.getTitle());
@@ -40,7 +40,7 @@ public class ProductMapper {
         dto.setThumbnail(product.getThumbnail());
         dto.setPattern(product.getPattern());
         dto.setPhotos(product.getPhotos());
-        dto.setDesigner(designerMapper.DesignerToOutput(product.getDesigner()));
+        dto.setDesigner(designerMapper.designerToOutput(product.getDesigner()));
         if (product.getCategories() != null) {
             List<String> categoryList = new ArrayList<>();
             for (Category category : product.getCategories()) {
@@ -65,7 +65,7 @@ public class ProductMapper {
         return dto;
     }
 
-    public Product InputToProduct(ProductInputDTO inputDTO) {
+    public Product inputToProduct(ProductInputDTO inputDTO) {
         Product product = new Product();
 
         product.setTitle(inputDTO.getTitle());
@@ -75,7 +75,7 @@ public class ProductMapper {
         product.setThumbnail(inputDTO.getThumbnail());
         product.setPhotos(inputDTO.getPhotos());
         product.setPattern(inputDTO.getPattern());
-//        dto.setDesigner(DesignerMapper.DesignerToOutput(inputDTO.getDesigner()));
+//        dto.setDesigner(DesignerMapper.designerToOutput(inputDTO.getDesigner()));
         if (inputDTO.getCategoryList() != null) {
             List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
             product.setCategories(categories);
@@ -101,7 +101,7 @@ public class ProductMapper {
         List<ProductOutputDTO> outputList = new ArrayList<>();
 
         for (Product product : products) {
-            ProductOutputDTO output = ProductToOutput(product);
+            ProductOutputDTO output = productToOutput(product);
             if (product.getIsAvailable()) {
                 outputList.add(output);
             }
