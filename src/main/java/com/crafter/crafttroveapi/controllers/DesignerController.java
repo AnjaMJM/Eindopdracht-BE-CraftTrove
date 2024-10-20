@@ -1,10 +1,9 @@
 package com.crafter.crafttroveapi.controllers;
 
+import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
-import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
-import com.crafter.crafttroveapi.DTOs.validation.UpdateGroup;
+import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
+import com.crafter.crafttroveapi.helpers.validation.UpdateGroup;
 import com.crafter.crafttroveapi.services.DesignerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,36 +26,39 @@ public class DesignerController {
 
     @GetMapping
     public ResponseEntity<List<DesignerOutputDTO>> getAllDesigners(){
-
-
         return ResponseEntity.ok(designerService.getAllDesigners());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> getProductById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+    public ResponseEntity<DesignerOutputDTO> getDesignerById(@PathVariable Long id) {
+        return ResponseEntity.ok(designerService.getDesignerById(id));
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<DesignerOutputDTO> getDesignerByBrandname(@PathVariable String name) {
+        return ResponseEntity.ok(designerService.getDesignersByBrandname(name));
     }
 
     @PostMapping
-    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody @Validated(CreateGroup.class) ProductInputDTO newProduct) {
-        ProductOutputDTO createdProduct = productService.createNewProduct(newProduct);
+    public ResponseEntity<DesignerOutputDTO> createNewDesigner(@RequestBody @Validated(CreateGroup.class) DesignerInputDTO newDesigner) {
+        DesignerOutputDTO createdDesigner = designerService.createNewDesigner(newDesigner);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(createdProduct.getId())
+                .buildAndExpand(createdDesigner.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(createdProduct);
+        return ResponseEntity.created(location).body(createdDesigner);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @RequestBody @Validated(UpdateGroup.class) ProductInputDTO updatedProduct){
-        ProductOutputDTO update = productService.updateProduct(id, updatedProduct);
+    @PutMapping("/{name}")
+    public ResponseEntity<DesignerOutputDTO> updateDesigner(@PathVariable String name, @RequestBody @Validated(UpdateGroup.class) DesignerInputDTO updatedDesigner){
+        DesignerOutputDTO update = designerService.updateDesigner(name, updatedDesigner);
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.ok("Product successfully deleted");
+    @DeleteMapping("/{name}")
+    public ResponseEntity<String> deleteDesigner(@PathVariable String name) {
+        designerService.deleteDesigner(name);
+        return ResponseEntity.ok("Designer successfully deleted");
     }
 }

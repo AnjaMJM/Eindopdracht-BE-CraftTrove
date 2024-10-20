@@ -2,10 +2,9 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
-import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
-import com.crafter.crafttroveapi.DTOs.validation.UpdateGroup;
+import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
+import com.crafter.crafttroveapi.helpers.validation.UpdateGroup;
 import com.crafter.crafttroveapi.services.ProductService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +40,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> getProductById(@PathVariable ("id") Long id) {
+    public ResponseEntity<ProductOutputDTO> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 

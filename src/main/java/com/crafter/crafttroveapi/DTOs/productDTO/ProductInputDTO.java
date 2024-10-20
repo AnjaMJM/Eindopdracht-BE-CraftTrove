@@ -1,6 +1,6 @@
 package com.crafter.crafttroveapi.DTOs.productDTO;
 
-import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
+import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

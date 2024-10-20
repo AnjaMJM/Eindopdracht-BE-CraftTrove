@@ -55,7 +55,7 @@ public class ReviewService {
         } else {
             throw new RecordNotFoundException("Product not found with id " + productId);
         }
-
+        // Nog te doen: voorwaarde aanmaken dat product is aangekocht door user
         Date dateOfReview = new Date();
         review.setDate(dateOfReview);
 

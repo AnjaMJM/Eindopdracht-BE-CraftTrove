@@ -2,7 +2,7 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
-import com.crafter.crafttroveapi.DTOs.validation.CreateGroup;
+import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
 import com.crafter.crafttroveapi.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

@@ -56,16 +56,17 @@ public class DesignerService {
         return designerMapper.designerToOutput(designer);
     }
 
-    public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner) {
+    public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner ) {//Long userId
         if (designerRepository.existsByBrandNameIgnoreCase(newDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
         }
+        // Voorwaarde toevoegen: user.isDesigner == true
         Designer designer = designerRepository.save(designerMapper.inputToDesigner(newDesigner));
         return designerMapper.designerToOutput(designer);
     }
 
-    public DesignerOutputDTO updateDesigner(Long id, DesignerInputDTO updatedDesigner) {
-        Optional<Designer> designer = designerRepository.findById(id);
+    public DesignerOutputDTO updateDesigner(String name, DesignerInputDTO updatedDesigner) {
+        Optional<Designer> designer = designerRepository.findDesignerByBrandNameIgnoreCase(name);
         if (designer.isPresent()) {
             Designer existingDesigner = designer.get();
 
@@ -90,16 +91,17 @@ public class DesignerService {
         }
     }
 
-
     @Transactional
     @CheckAvailability
     public void deleteDesigner(String name) {
         Optional<Designer> optionalDesigner = designerRepository.findDesignerByBrandNameIgnoreCase(name);
         if (optionalDesigner.isPresent()) {
             Designer designer = optionalDesigner.get();
-
+            List<Product> products = optionalDesigner.get().getProducts();
+            for(Product product:products){
+                product.setIsAvailable(false);
+            }
             designerRepository.delete(designer);
-
         } else {
             throw new RecordNotFoundException( "Brand " + name + " is not found");
         }
