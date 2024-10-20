@@ -10,11 +10,13 @@ import java.util.List;
 public class DesignerOutputDTO {
     private Long id;
 
-    private String designerName;
+    private String username;
 
     private String brandName;
 
-    private String shopDescription;
+    private String logo;
+
+    private String brandDescription;
 
     private List<Long> productIdList;
 }

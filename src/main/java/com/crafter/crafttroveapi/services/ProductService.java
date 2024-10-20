@@ -15,8 +15,6 @@ import com.crafter.crafttroveapi.repositories.KeywordRepository;
 import com.crafter.crafttroveapi.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,7 +45,7 @@ public class ProductService {
         List<ProductOutputDTO> dtos = new ArrayList<>();
 
         for (Product product : products) {
-            dtos.add(productMapper.ProductToOutput(product));
+            dtos.add(productMapper.productToOutput(product));
         }
         return dtos;
     }
@@ -57,7 +55,7 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RecordNotFoundException("Product not found"));
 
-        return productMapper.ProductToOutput(product);
+        return productMapper.productToOutput(product);
     }
 
     @CheckAvailability(type = CheckType.CATEGORY)
@@ -80,10 +78,68 @@ public class ProductService {
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
-
-        Product p = productRepository.save(productMapper.InputToProduct(newProduct));
-        return productMapper.ProductToOutput(p);
+        Product p = productRepository.save(productMapper.inputToProduct(newProduct));
+        return productMapper.productToOutput(p);
     }
+
+    @CheckAvailability
+    public ProductOutputDTO updateProduct(Long id, ProductInputDTO updatedProduct) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            Product existingProduct = product.get();
+
+// designer stays the same. check if needs to be added to list
+            if (updatedProduct.getTitle() != null) {
+
+                if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
+                    throw new DuplicateRecordException("A product with this name already exists");
+                } else {
+                    existingProduct.setTitle(updatedProduct.getTitle());
+                }
+
+            }
+            if (updatedProduct.getDescription() != null) {
+                existingProduct.setDescription(updatedProduct.getDescription());
+            }
+            if (updatedProduct.getPrice() != null) {
+                existingProduct.setPrice(updatedProduct.getPrice());
+            }
+            if (updatedProduct.getThumbnail() != null) {
+                existingProduct.setThumbnail(updatedProduct.getThumbnail());
+            }
+            if (updatedProduct.getPhotos() != null) {
+                existingProduct.setPhotos(updatedProduct.getPhotos());
+            }
+            if (updatedProduct.getPattern() != null) {
+                existingProduct.setPattern(updatedProduct.getPattern());
+            }
+            if (updatedProduct.getCategoryList() != null) {
+                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
+                existingProduct.setCategories(categories);
+            }
+            if (updatedProduct.getKeywordList() != null) {
+                List<Keyword> keywords = new ArrayList<>();
+                for (String keywordName : updatedProduct.getKeywordList()) {
+                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+                            .orElseGet(() -> {
+                                Keyword newKeyword = new Keyword();
+                                newKeyword.setName(keywordName);
+                                return keywordRepository.save(newKeyword);
+                            });
+                    keywords.add(keyword);
+                }
+                existingProduct.setKeywords(keywords);
+            }
+            if (updatedProduct.getIsAvailable() != null) {
+                existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
+            }
+            Product savedProduct = productRepository.save(existingProduct);
+            return productMapper.productToOutput(savedProduct);
+        } else {
+            throw new RecordNotFoundException("This product does not exist");
+        }
+    }
+
 
     @Transactional
     @CheckAvailability

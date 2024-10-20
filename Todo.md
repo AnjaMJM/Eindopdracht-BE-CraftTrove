@@ -23,7 +23,7 @@
 * 3 belangrijke kernfunctionaliteiten (naast Authenticate en authorization)
   * toevoegen van patronen door designer
   * kopen van patronen door users
-  * zoeken/ophalen van patronen a.d.h. van categorie, designer en/of keywords
+  ~~* zoeken/ophalen van patronen a.d.h. van categorie, designer en/of keywords~~
   * Authenticatie van users
   * Authorisatie van verschillende rollen
 * 2 a 3 rollen

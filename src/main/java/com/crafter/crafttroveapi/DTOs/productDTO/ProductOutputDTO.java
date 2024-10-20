@@ -1,8 +1,6 @@
 package com.crafter.crafttroveapi.DTOs.productDTO;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
-import com.crafter.crafttroveapi.helpers.ProductStatus;
-import com.crafter.crafttroveapi.models.*;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -8,7 +8,6 @@ import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.models.Review;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
 import com.crafter.crafttroveapi.repositories.KeywordRepository;
-import com.crafter.crafttroveapi.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,14 +21,16 @@ public class ProductMapper {
 
     private final KeywordRepository keywordRepository;
 
+    private final DesignerMapper designerMapper;
+
     @Autowired
-    public ProductMapper(CategoryRepository categoryRepository, KeywordRepository keywordRepository) {
+    public ProductMapper(CategoryRepository categoryRepository, KeywordRepository keywordRepository, DesignerMapper designerMapper) {
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
+        this.designerMapper = designerMapper;
     }
 
-
-    public ProductOutputDTO ProductToOutput(Product product) {
+    public ProductOutputDTO productToOutput(Product product) {
         ProductOutputDTO dto = new ProductOutputDTO();
         dto.setId(product.getId());
         dto.setTitle(product.getTitle());
@@ -37,8 +38,9 @@ public class ProductMapper {
         dto.setPrice(product.getPrice());
         dto.setIsAvailable(product.getIsAvailable());
         dto.setThumbnail(product.getThumbnail());
+        dto.setPattern(product.getPattern());
         dto.setPhotos(product.getPhotos());
-//        dto.setDesigner(DesignerMapper.DesignerToOutput(product.getDesigner()));
+        dto.setDesigner(designerMapper.designerToOutput(product.getDesigner()));
         if (product.getCategories() != null) {
             List<String> categoryList = new ArrayList<>();
             for (Category category : product.getCategories()) {
@@ -63,7 +65,7 @@ public class ProductMapper {
         return dto;
     }
 
-    public Product InputToProduct(ProductInputDTO inputDTO) {
+    public Product inputToProduct(ProductInputDTO inputDTO) {
         Product product = new Product();
 
         product.setTitle(inputDTO.getTitle());
@@ -73,7 +75,7 @@ public class ProductMapper {
         product.setThumbnail(inputDTO.getThumbnail());
         product.setPhotos(inputDTO.getPhotos());
         product.setPattern(inputDTO.getPattern());
-//        dto.setDesigner(DesignerMapper.DesignerToOutput(inputDTO.getDesigner()));
+//        dto.setDesigner(DesignerMapper.designerToOutput(inputDTO.getDesigner()));
         if (inputDTO.getCategoryList() != null) {
             List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
             product.setCategories(categories);
@@ -98,12 +100,57 @@ public class ProductMapper {
         List<Product> products = new ArrayList<>(p);
         List<ProductOutputDTO> outputList = new ArrayList<>();
 
-        for(Product product: products){
-            ProductOutputDTO output = ProductToOutput(product);
-            if(product.getIsAvailable()) {
+        for (Product product : products) {
+            ProductOutputDTO output = productToOutput(product);
+            if (product.getIsAvailable()) {
                 outputList.add(output);
             }
         }
         return outputList;
     }
+
+//    public Product UpdatedInputToProduct(ProductInputDTO updatedInput) {
+//        Optional<Product> product = productRepository.findById(id);
+//        if (product.isPresent()) {
+//            Product existingProduct = product.get();
+//
+//            if (updatedInput.getTitle() != null) {
+//                existingProduct.setTitle(updatedInput.getTitle());
+//            }
+//            if (updatedInput.getDescription() != null) {
+//                existingProduct.setDescription(updatedInput.getDescription());
+//            }
+//            if (updatedInput.getPrice() != null) {
+//                existingProduct.setPrice(updatedInput.getPrice());
+//            }
+//            if (updatedInput.getThumbnail() != null) {
+//                existingProduct.setThumbnail(updatedInput.getThumbnail());
+//            }
+//            if (updatedInput.getPhotos() != null) {
+//                existingProduct.setPhotos(updatedInput.getPhotos());
+//            }
+//            if (updatedInput.getPattern() != null) {
+//                existingProduct.setPattern(updatedInput.getPattern());
+//            }
+//            if (updatedInput.getCategoryList() != null) {
+//                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedInput.getCategoryList());
+//                existingProduct.setCategories(categories);
+//            }
+//            if (updatedInput.getKeywordList() != null) {
+//                List<Keyword> keywords = new ArrayList<>();
+//                for (String keywordName : updatedInput.getKeywordList()) {
+//                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+//                            .orElseGet(() -> {
+//                                Keyword newKeyword = new Keyword();
+//                                newKeyword.setName(keywordName);
+//                                return keywordRepository.save(newKeyword);
+//                            });
+//                    keywords.add(keyword);
+//                }
+//                existingProduct.setKeywords(keywords);
+//            }
+//            if (updatedInput.getIsAvailable() != null) {
+//                existingProduct.setIsAvailable(updatedInput.getIsAvailable());
+//            }
 }
+
