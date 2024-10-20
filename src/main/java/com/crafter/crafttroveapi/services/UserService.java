@@ -48,20 +48,20 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByEmail((newUser.getEmail()))) {
             throw new DuplicateRecordException("An account with this e-mailadres already exists");
         }
-        User user = new User();
+        User user = userMapper.inputToUser(newUser);
 
         Set<Role> roles = new HashSet<>();
-        RoleDTO userRole = new RoleDTO();
+        Role userRole = new Role();
         userRole.setName(RoleEnum.ROLE_USER);
-        roles.add(roleMapper.inputToRole(userRole));
-
-        if (newUser.getIsDesigner()) {
-            RoleDTO designerRole = new RoleDTO();
+        roles.add(userRole);
+        if (newUser.isDesigner()) {
+            Role designerRole = new Role();
             designerRole.setName(RoleEnum.ROLE_DESIGNER);
-            roles.add(roleMapper.inputToRole(designerRole));
+            roles.add(designerRole);
         }
         user.setRoles(roles);
-        User createdUser = userRepository.save(userMapper.inputToUser(newUser));
+        user.setEnabled(true);
+        User createdUser = userRepository.save(user);
          return userMapper.userToOutput(createdUser);
     }
 

@@ -38,16 +38,19 @@ public class UserInputDTO {
 
     private List<String> productWishlist;
 
-    private Boolean isDesigner;
+    private boolean designer;
 
     private Set<RoleDTO> roles;
 
 
-    private boolean isExpired;
+    private boolean expired;
 
-    private boolean isLocked;
+    private boolean locked;
 
     private boolean areCredentialsExpired;
 
-    private boolean isEnabled;
+    private boolean enabled;
+
+    public UserInputDTO() {
+    }
 }

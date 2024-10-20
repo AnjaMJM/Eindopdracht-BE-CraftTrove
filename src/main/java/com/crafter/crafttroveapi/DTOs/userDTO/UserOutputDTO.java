@@ -1,7 +1,6 @@
 package com.crafter.crafttroveapi.DTOs.userDTO;
 
 import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
-import com.crafter.crafttroveapi.models.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,18 +18,18 @@ public class UserOutputDTO {
     private List<String> productWishlist;
     private List<Long> purchases;
     private List<String> reviews;
-    private Boolean isDesigner;
+    private boolean isDesigner;
     private Set<RoleDTO> roles;
 
     private String password;
 
     // Onderstaande toevoegen aan mappers en uitzoeken waar en hoe ze verder gebruikt worden
 
-    private boolean isExpired;
+    private boolean expired;
 
-    private boolean isLocked;
+    private boolean locked;
 
     private boolean areCredentialsExpired;
 
-    private boolean isEnabled;
+    private boolean enabled;
 }

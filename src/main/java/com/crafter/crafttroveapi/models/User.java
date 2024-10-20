@@ -54,20 +54,23 @@ public class User {
     private List<Review> reviews;
 
     @Column(columnDefinition = "boolean default false")
-    private Boolean isDesigner;
+    private boolean isDesigner;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_name"))
     private Set<Role> roles = new HashSet<>();
 
-    @Column(nullable = false)
-    private boolean isExpired = false;
-    @Column(nullable = false)
-    private boolean isLocked = false;
-    @Column(nullable = false)
-    private boolean areCredentialsExpired = false;
-    @Column(nullable = false)
-    private boolean isEnabled = true;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isExpired;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isLocked;
+    @Column(columnDefinition = "boolean default false")
+    private boolean areCredentialsExpired;
+    @Column(columnDefinition = "boolean default true")
+    private boolean isEnabled;
+
+    public User() {
+    }
 }

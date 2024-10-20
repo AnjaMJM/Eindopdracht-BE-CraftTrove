@@ -46,8 +46,13 @@ public class UserMapper {
             }
             dto.setCategoryPreferences(productList);
         }
-        dto.setIsDesigner(user.getIsDesigner());
+        dto.setDesigner(user.isDesigner());
+        dto.setExpired(user.isExpired());
+        dto.setLocked(user.isLocked());
+        dto.setAreCredentialsExpired(user.isAreCredentialsExpired());
+        dto.setEnabled(user.isEnabled());
         dto.setRoles(roleMapper.listRoleToOutput(user.getRoles()));
+
         return dto;
     }
 
@@ -60,7 +65,11 @@ public class UserMapper {
             List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryPreferences());
             user.setPreferences(categories);
         }
-        user.setIsDesigner(inputDTO.getIsDesigner());
+        user.setDesigner(inputDTO.isDesigner());
+        user.setExpired(inputDTO.isExpired());
+        user.setLocked(inputDTO.isLocked());
+        user.setAreCredentialsExpired(inputDTO.isAreCredentialsExpired());
+        user.setEnabled(inputDTO.isEnabled());
         user.setRoles(roleMapper.listInputToRoles(inputDTO.getRoles()));
         return user;
     }

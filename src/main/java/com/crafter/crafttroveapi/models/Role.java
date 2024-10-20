@@ -17,7 +17,8 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleEnum name;
 
-    private boolean active;
+    @Column(columnDefinition = "boolean default true")
+    private boolean active = true;
 
     public Role() {
     }
