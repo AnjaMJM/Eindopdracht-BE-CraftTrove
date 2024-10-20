@@ -1,5 +1,6 @@
 package com.crafter.crafttroveapi.DTOs.roleDTO;
 
+import com.crafter.crafttroveapi.helpers.RoleEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,10 +10,13 @@ public class RoleDTO {
 
     private Long id;
 
-    private String name;
+    private RoleEnum name;
 
     private boolean active;
 
+    public RoleDTO(){
+
+    }
     public RoleDTO(Long id) {
     }
 }

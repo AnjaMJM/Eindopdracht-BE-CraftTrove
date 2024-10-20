@@ -1,5 +1,6 @@
 package com.crafter.crafttroveapi.controllers;
 
+import com.crafter.crafttroveapi.DTOs.userDTO.UserLoginRequestDTO;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import com.crafter.crafttroveapi.security.JwtService;
 import org.springframework.http.HttpHeaders;
@@ -21,23 +22,23 @@ public class AuthController {
         this.jwtService = service;
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<Object> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO
-//    ) {
-//        UsernamePasswordAuthenticationToken up =
-//                new UsernamePasswordAuthenticationToken(userLoginRequestDTO.getUserName(), userLoginRequestDTO.getPassword());
-//
-//        try {
-//            Authentication auth = authManager.authenticate(up);
-//
-//            var ud = (ApiUserDetails) auth.getPrincipal();
-//            String token = jwtService.generateToken(ud);
-//
-//            return ResponseEntity.ok()
-//                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-//                    .body("Token generated");
-//        } catch (AuthenticationException ex) {
-//            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
-//        }
-//    }
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO
+    ) {
+        UsernamePasswordAuthenticationToken up =
+                new UsernamePasswordAuthenticationToken(userLoginRequestDTO.getUsername(), userLoginRequestDTO.getPassword());
+
+        try {
+            Authentication auth = authManager.authenticate(up);
+
+            var ud = (ApiUserDetails) auth.getPrincipal();
+            String token = jwtService.generateToken(ud);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .body("Token generated");
+        } catch (AuthenticationException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="roles")
+@Table(name = "roles")
 @Getter
 @Setter
 public class Role {
@@ -20,7 +20,6 @@ public class Role {
     private boolean active;
 
     public Role() {
-
     }
 
     public Role(RoleEnum name) {

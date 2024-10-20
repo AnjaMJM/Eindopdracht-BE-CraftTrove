@@ -1,9 +1,13 @@
 package com.crafter.crafttroveapi.services;
 
+import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
+import com.crafter.crafttroveapi.helpers.RoleEnum;
+import com.crafter.crafttroveapi.mappers.RoleMapper;
 import com.crafter.crafttroveapi.mappers.UserMapper;
+import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
 import com.crafter.crafttroveapi.repositories.RoleRepository;
 import com.crafter.crafttroveapi.repositories.UserRepository;
@@ -15,24 +19,27 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService (UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService (UserRepository userRepository, UserMapper userMapper, RoleMapper roleMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     public UserOutputDTO createNewUser(UserInputDTO newUser) {
         if (userRepository.existsByUsername(newUser.getUsername())) {
@@ -43,16 +50,25 @@ public class UserService implements UserDetailsService {
         }
         User user = new User();
 
-        user.setUsername(newUser.getUsername());
-        user.setEmail(newUser.getEmail());
+        Set<Role> roles = new HashSet<>();
+        RoleDTO userRole = new RoleDTO();
+        userRole.setName(RoleEnum.ROLE_USER);
+        roles.add(roleMapper.inputToRole(userRole));
 
-        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
-
-        user = userRepository.save(userMapper.inputToUser(newUser));
-         return userMapper.userToOutput(user);
+        if (newUser.getIsDesigner()) {
+            RoleDTO designerRole = new RoleDTO();
+            designerRole.setName(RoleEnum.ROLE_DESIGNER);
+            roles.add(roleMapper.inputToRole(designerRole));
+        }
+        user.setRoles(roles);
+        User createdUser = userRepository.save(userMapper.inputToUser(newUser));
+         return userMapper.userToOutput(createdUser);
     }
 
-
+//    public Optional<UserOutputDTO> getUserByUserNameAndPassword(String username, String password) {
+//        var user = userRepository.findByUsernameAndPassword(username, password);
+//        return getOptionalUserModel(user);
+//    }
 
 //        private void updateRolesWithUser(User user) {
 //            for (Role role: user.getRoles()) {
