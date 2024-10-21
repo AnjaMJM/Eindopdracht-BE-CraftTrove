@@ -24,14 +24,5 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<UserOutputDTO> createNewUser(@RequestBody @Validated(CreateGroup.class)UserInputDTO newUser) {
-        UserOutputDTO createdUser = userService.createNewUser(newUser);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(createdUser.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(createdUser);
-    }
+
 }

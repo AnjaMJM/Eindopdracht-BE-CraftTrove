@@ -9,6 +9,10 @@ import com.crafter.crafttroveapi.services.ProductService;
 import com.crafter.crafttroveapi.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +26,11 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     private final ProductService productService;
+    private Authentication authentication;
+
+    private void setAuthentication(SecurityContext context) {
+        this.authentication =context.getAuthentication();
+    }
 
     @Autowired
     public ReviewController(ReviewService reviewService, ProductService productService) {
@@ -31,6 +40,8 @@ public class ReviewController {
 
     @PostMapping("/product/{id}/review")
     public ResponseEntity<ReviewOutputDTO> createNewReview(@PathVariable Long id, @RequestBody ReviewInputDTO newReview) {
+        setAuthentication(SecurityContextHolder.getContext());
+
         ReviewOutputDTO createdReview = reviewService.createReview(newReview, id);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

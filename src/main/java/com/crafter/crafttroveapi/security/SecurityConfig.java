@@ -27,25 +27,27 @@ public class SecurityConfig {
         http
                 .httpBasic(hp -> hp.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers(HttpMethod.GET, "/products").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/products/**").hasAuthority("ROLE_DESIGNER")
-                                .requestMatchers(HttpMethod.PUT, "/products/**").hasAuthority("ROLE_DESIGNER")
-                                .requestMatchers(HttpMethod.GET, "/designers").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/designers").hasAuthority("ROLE_USER")
-                                .requestMatchers("/users").permitAll()
-                                .requestMatchers("/login").permitAll()
-//                            .requestMatchers("/public/**").permitAll()
-//                            .requestMatchers("/secure").authenticated()
-//                            .requestMatchers("/secure/admin").hasRole("ADMIN")
-//                            .requestMatchers(httpMethod.GET, "/users/**").hasRole("ADMIN")
-//                            .requestMatchers("/secure/user").hasRole("USER")
-//                            .anyRequest().denyAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/designers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/keywords").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+                        .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
+                        .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+                        .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
+                        .requestMatchers("/users").permitAll()
+                        .requestMatchers("/users/**").authenticated()
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        ;
+                .cors(cors -> {
+                })
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
         return http.build();
     }
 
