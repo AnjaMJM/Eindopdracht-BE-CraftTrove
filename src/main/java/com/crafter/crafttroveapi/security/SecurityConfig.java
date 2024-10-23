@@ -2,6 +2,7 @@ package com.crafter.crafttroveapi.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,38 +17,49 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-        @Bean
-        public static PasswordEncoder passwordEncoder(){
-            return new BCryptPasswordEncoder();
-        }
+    @Bean
+    public static PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
-            http
-                    .httpBasic(hp -> hp.disable())
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/**").permitAll()
-//                            .requestMatchers("/public/**").permitAll()
-//                            .requestMatchers("/secure").authenticated()
-//                            .requestMatchers("/secure/admin").hasRole("ADMIN")
-//                            .requestMatchers("/users/**").hasRole("ADMIN")
-//                            .requestMatchers("/secure/user").hasRole("USER")
-//                            .anyRequest().denyAll()
-                    )
-                    .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                    .csrf(csrf -> csrf.disable())
-                    .cors(Customizer.withDefaults())
-                    .sessionManagement( session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            ;
-            return  http.build();
-        }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
+        http
+                .httpBasic(hp -> hp.disable())
+                .authorizeHttpRequests(auth -> auth
+                        //Iedereen toestemming geven om endpoints te kunnen testen
+                        .requestMatchers("/**").permitAll()
 
-        @Bean
-        public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder encoder, UserDetailsService apiUserDetailsService) throws Exception {
-            var builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-            builder.userDetailsService(apiUserDetailsService).passwordEncoder(encoder);
-            return builder.build();
-        }
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/designers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories").hasAuthority("ROLE_DESIGNER")
+                        .requestMatchers(HttpMethod.GET, "/keywords").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+                        .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
+                        .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+                        .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
+                        .requestMatchers("/users").permitAll()
+                        .requestMatchers("/users/**").authenticated()
+                        .anyRequest().denyAll()
+                )
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {
+                })
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder encoder, UserDetailsService apiUserDetailsService) throws Exception {
+        var builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.userDetailsService(apiUserDetailsService).passwordEncoder(encoder);
+        return builder.build();
+    }
 
 
 }

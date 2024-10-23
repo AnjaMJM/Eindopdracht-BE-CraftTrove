@@ -1,9 +1,13 @@
 package com.crafter.crafttroveapi.services;
 
+import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
+import com.crafter.crafttroveapi.helpers.RoleEnum;
+import com.crafter.crafttroveapi.mappers.RoleMapper;
 import com.crafter.crafttroveapi.mappers.UserMapper;
+import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
 import com.crafter.crafttroveapi.repositories.RoleRepository;
 import com.crafter.crafttroveapi.repositories.UserRepository;
@@ -15,24 +19,27 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService (UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService (UserRepository userRepository, UserMapper userMapper, RoleMapper roleMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     public UserOutputDTO createNewUser(UserInputDTO newUser) {
         if (userRepository.existsByUsername(newUser.getUsername())) {
@@ -41,18 +48,27 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByEmail((newUser.getEmail()))) {
             throw new DuplicateRecordException("An account with this e-mailadres already exists");
         }
-        User user = new User();
+        User user = userMapper.inputToUser(newUser);
 
-        user.setUsername(newUser.getUsername());
-        user.setEmail(newUser.getEmail());
-
-        user.setPassword(passwordEncoder.encode(newUser.getPassword()));
-
-        user = userRepository.save(userMapper.inputToUser(newUser));
-         return userMapper.userToOutput(user);
+        Set<Role> roles = new HashSet<>();
+        Role userRole = new Role();
+        userRole.setName(RoleEnum.ROLE_USER);
+        roles.add(userRole);
+        if (newUser.isDesigner()) {
+            Role designerRole = new Role();
+            designerRole.setName(RoleEnum.ROLE_DESIGNER);
+            roles.add(designerRole);
+        }
+        user.setRoles(roles);
+        user.setEnabled(true);
+        User createdUser = userRepository.save(user);
+         return userMapper.userToOutput(createdUser);
     }
 
-
+//    public Optional<UserOutputDTO> getUserByUserNameAndPassword(String username, String password) {
+//        var user = userRepository.findByUsernameAndPassword(username, password);
+//        return getOptionalUserModel(user);
+//    }
 
 //        private void updateRolesWithUser(User user) {
 //            for (Role role: user.getRoles()) {

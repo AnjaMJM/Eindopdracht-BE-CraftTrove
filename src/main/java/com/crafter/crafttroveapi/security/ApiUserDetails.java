@@ -46,25 +46,25 @@ public class ApiUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return  user.getId() + "::" + user.getUsername();
+        return  user.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return !user.getIsExpired();
+        return !user.isExpired();
     }
     @Override
     public boolean isAccountNonLocked() {
-        return !user.getIsLocked();
+        return !user.isLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return !user.getAreCredentialsExpired();
+        return !user.isAreCredentialsExpired();
     }
 
     @Override
     public boolean isEnabled() {
-        return user.getIsEnabled();
+        return user.isEnabled();
     }
 }

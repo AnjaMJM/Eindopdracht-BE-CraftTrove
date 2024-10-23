@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="roles")
+@Table(name = "roles")
 @Getter
 @Setter
 public class Role {
@@ -17,10 +17,10 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleEnum name;
 
-    private boolean active;
+    @Column(columnDefinition = "boolean default true")
+    private boolean active = true;
 
     public Role() {
-
     }
 
     public Role(RoleEnum name) {

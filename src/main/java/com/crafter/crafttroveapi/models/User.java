@@ -1,7 +1,7 @@
 package com.crafter.crafttroveapi.models;
 
+import com.crafter.crafttroveapi.helpers.RoleEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.AssertFalse;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Check;
@@ -53,16 +53,24 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Review> reviews;
 
-    private Boolean isDesigner;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDesigner;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+            inverseJoinColumns = @JoinColumn(name = "role_name"))
     private Set<Role> roles = new HashSet<>();
 
-    private Boolean isExpired;
-    private Boolean isLocked;
-    private Boolean areCredentialsExpired;
-    private Boolean isEnabled;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isExpired;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isLocked;
+    @Column(columnDefinition = "boolean default false")
+    private boolean areCredentialsExpired;
+    @Column(columnDefinition = "boolean default true")
+    private boolean isEnabled;
+
+    public User() {
+    }
 }

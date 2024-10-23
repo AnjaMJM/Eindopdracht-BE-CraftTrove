@@ -3,10 +3,12 @@ package com.crafter.crafttroveapi.mappers;
 import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
 import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.models.Role;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
 public class RoleMapper {
 
     public RoleDTO roleToOutput(Role role) {
@@ -14,7 +16,7 @@ public class RoleMapper {
             return null;
         }
         RoleDTO dto = new RoleDTO(role.getId());
-        dto.setName(String.valueOf(role.getName()));
+        dto.setName(role.getName());
         dto.setActive(role.isActive());
         return dto;
     }
@@ -24,26 +26,27 @@ public class RoleMapper {
             return null;
         }
         Role role = new Role();
-        role.setName(RoleEnum.valueOf(dto.getName()));
+        role.setName(dto.getName());
         role.setActive(dto.isActive());
         return role;
     }
 
-    public List<RoleDTO> listRoleToOutput(List<Role> roles) {
+
+    public Set<RoleDTO> listRoleToOutput(Set<Role> roles) {
         if (roles == null) {
             return null;
         }
         return roles.stream()
                 .map(this::roleToOutput)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
-    public List<Role> listInputToRoles(List<RoleDTO> dtos) {
+    public Set<Role> listInputToRoles(Set<RoleDTO> dtos) {
         if (dtos == null) {
             return null;
         }
         return dtos.stream()
                 .map(this::inputToRole)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

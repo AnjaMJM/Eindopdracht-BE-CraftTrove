@@ -1,7 +1,11 @@
 package com.crafter.crafttroveapi.DTOs.userDTO;
 
+import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
+import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
+import com.crafter.crafttroveapi.models.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -10,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -33,5 +38,19 @@ public class UserInputDTO {
 
     private List<String> productWishlist;
 
-    private Boolean isDesigner;
+    private boolean designer;
+
+    private Set<RoleDTO> roles;
+
+
+    private boolean expired;
+
+    private boolean locked;
+
+    private boolean areCredentialsExpired;
+
+    private boolean enabled;
+
+    public UserInputDTO() {
+    }
 }
