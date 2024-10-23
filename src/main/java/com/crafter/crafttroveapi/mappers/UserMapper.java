@@ -30,7 +30,6 @@ public class UserMapper {
         UserOutputDTO dto = new UserOutputDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
-        dto.setPassword(user.getPassword());
         dto.setEmail(user.getEmail());
         if (user.getPreferences() != null) {
             List<String> categoryList = new ArrayList<>();

@@ -11,10 +11,8 @@
 
 ### Verantwoordingsdocument
 * Inleiding
-* Verantwoording 5 technische keuzes (bijvoorbeeld over OOP-structuren,
-  design patterns, Web-API of architectuur) + reflectie (welke alternatieven zijn er?)
-  * getter en setter van lombok
-  * DTO's en mappers gescheiden in eigen entiteiten
+~~* Verantwoording 5 technische keuzes (bijvoorbeeld over OOP-structuren,~~
+  ~~design patterns, Web-API of architectuur) + reflectie (welke alternatieven zijn er?)~~
 * 5 realistische limitaties + Mogelijke doorontwikkelingen
 * reflectie op leerproces
 * link naar github-repository
@@ -24,13 +22,13 @@
   * toevoegen van patronen door designer
   * kopen van patronen door users
   ~~* zoeken/ophalen van patronen a.d.h. van categorie, designer en/of keywords~~
-  * Authenticatie van users
+  ~~* Authenticatie van users~~
   * Authorisatie van verschillende rollen
-* 2 a 3 rollen
+~~* 2 a 3 rollen~~
   * User
   * Designer
   * Admin
-* 6 Entiteiten (klassen)
+~~* 6 Entiteiten (klassen)~~
   ~~* Product~~
  ~~* Review~~ 
   ~~* Admin~~
@@ -39,19 +37,16 @@
   ~~* Keyword~~
   ~~* Designer~~
   ~~* Category~~
-  * Security
-
 * 2 geslaagde integratietesten
-* 2 classes 100% coverage met unit-tests, gebruikmakend van de drie A's
+* 2 classes 100% coverage met unit-tests op service-classes, gebruikmakend van de drie A's, minimaal 10 tests
 * Exception handling (voorkom 500-foutmeldingen)
 * 20 commits
 * 5 pull requests + mergen naar main
-* Modellen met data constraints (bv NotNull, max. en min. value, ..)
-  * Database constraints op entity (@Column()), Validation annotations in inputDTO's! (=technische keuze)
+~~* Modellen met data constraints (bv NotNull, max. en min. value, ..)~~
+  ~~* Database constraints op entity (@Column()), Validation annotations in inputDTO's! (=technische keuze)~~
 * Database met testdata via data.sql
 * validatie inkomende data
 * upload/download integratie
-* implementatie kwalitatieve web-API 
 * volledig volgens REST richtlijnen
 
 ### Installatiehandleiding
