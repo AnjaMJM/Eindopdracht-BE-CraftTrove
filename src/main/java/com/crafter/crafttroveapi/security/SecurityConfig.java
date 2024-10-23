@@ -27,12 +27,15 @@ public class SecurityConfig {
         http
                 .httpBasic(hp -> hp.disable())
                 .authorizeHttpRequests(auth -> auth
+                        //Iedereen toestemming geven om endpoints te kunnen testen
+                        .requestMatchers("/**").permitAll()
+
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/designers").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/categories").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/keywords").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories").hasAuthority("ROLE_DESIGNER")
+                        .requestMatchers(HttpMethod.GET, "/keywords").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
                         .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")

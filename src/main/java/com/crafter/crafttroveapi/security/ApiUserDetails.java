@@ -46,7 +46,7 @@ public class ApiUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return  user.getId() + "::" + user.getUsername();
+        return  user.getUsername();
     }
 
     @Override

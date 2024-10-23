@@ -38,7 +38,7 @@ public class ReviewController {
         this.productService = productService;
     }
 
-    @PostMapping("/product/{id}/review")
+    @PostMapping("/products/{id}/review")
     public ResponseEntity<ReviewOutputDTO> createNewReview(@PathVariable Long id, @RequestBody ReviewInputDTO newReview) {
         setAuthentication(SecurityContextHolder.getContext());
 
