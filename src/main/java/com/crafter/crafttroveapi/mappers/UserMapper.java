@@ -43,7 +43,7 @@ public class UserMapper {
             for (Product product : user.getWishlist()) {
                 productList.add(product.getTitle());
             }
-            dto.setCategoryPreferences(productList);
+            dto.setProductWishlist(productList);
         }
         dto.setDesigner(user.isDesigner());
         dto.setExpired(user.isExpired());

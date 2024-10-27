@@ -18,7 +18,7 @@ public class Role {
     private RoleEnum name;
 
     @Column(columnDefinition = "boolean default true")
-    private boolean active = true;
+    private boolean isActive = true;
 
     public Role() {
     }

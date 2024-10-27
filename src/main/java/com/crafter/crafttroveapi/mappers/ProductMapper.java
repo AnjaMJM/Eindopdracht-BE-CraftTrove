@@ -75,7 +75,7 @@ public class ProductMapper {
         product.setThumbnail(inputDTO.getThumbnail());
         product.setPhotos(inputDTO.getPhotos());
         product.setPattern(inputDTO.getPattern());
-//        dto.setDesigner(DesignerMapper.designerToOutput(inputDTO.getDesigner()));
+        product.setDesigner(inputDTO.getDesigner());
         if (inputDTO.getCategoryList() != null) {
             List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
             product.setCategories(categories);

@@ -38,7 +38,7 @@
   ~~* Designer~~
   ~~* Category~~
 * 2 geslaagde integratietesten
-* 2 classes 100% coverage met unit-tests op service-classes, gebruikmakend van de drie A's, minimaal 10 tests
+~~* 2 classes 100% coverage met unit-tests op service-classes, gebruikmakend van de drie A's, minimaal 10 tests~~
 * Exception handling (voorkom 500-foutmeldingen)
 * 20 commits
 * 5 pull requests + mergen naar main

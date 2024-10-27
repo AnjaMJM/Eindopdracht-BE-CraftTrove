@@ -26,11 +26,14 @@ public class Purchase {
     private Date date;
 
     @Column(nullable = false)
-    private Double totalPrice;
+    private double totalPrice;
 
     @ManyToMany(mappedBy = "purchases", fetch = FetchType.LAZY)
     @Column(nullable = false)
     private List<Product> products;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean isPayed;
 
 
 }

@@ -1,44 +1,35 @@
 package com.crafter.crafttroveapi.services;
 
-import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
+import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.RoleEnum;
-import com.crafter.crafttroveapi.mappers.RoleMapper;
 import com.crafter.crafttroveapi.mappers.UserMapper;
 import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
-import com.crafter.crafttroveapi.repositories.RoleRepository;
 import com.crafter.crafttroveapi.repositories.UserRepository;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final RoleMapper roleMapper;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+
 
     @Autowired
-    public UserService (UserRepository userRepository, UserMapper userMapper, RoleMapper roleMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.roleMapper = roleMapper;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+
     }
 
     public UserOutputDTO createNewUser(UserInputDTO newUser) {
@@ -62,44 +53,46 @@ public class UserService implements UserDetailsService {
         user.setRoles(roles);
         user.setEnabled(true);
         User createdUser = userRepository.save(user);
-         return userMapper.userToOutput(createdUser);
+        return userMapper.userToOutput(createdUser);
     }
 
-//    public Optional<UserOutputDTO> getUserByUserNameAndPassword(String username, String password) {
-//        var user = userRepository.findByUsernameAndPassword(username, password);
-//        return getOptionalUserModel(user);
-//    }
+    public List<UserOutputDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserOutputDTO> dtos = new ArrayList<>();
 
-//        private void updateRolesWithUser(User user) {
-//            for (Role role: user.getRoles()) {
-//                role.getUsers().add(user);
-//            }
-//        }
-//        @Transactional
-//        public boolean createUser(UserModel userModel, String[] roles) {
-//            return createUser(userModel, Arrays.asList(roles));
-//        }
-//
-        public Optional<User> getUserByUserName(String username) {
-            var user = userRepository.findByUsername(username);
-            return user;
+        for (User user : users) {
+            dtos.add(userMapper.userToOutput(user));
         }
+        return dtos;
+    }
 
-        @Override
-        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            Optional<User> user = getUserByUserName(username);
-            if (user.isEmpty()) { throw new UsernameNotFoundException(username);}
-            return new ApiUserDetails(user.get());
+    public Optional<User> getUserByUserName(String username) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if(optionalUser.isEmpty()) {
+            throw new RecordNotFoundException("User does not exist");
         }
-//
-//        public boolean updatePassword(UserModel userModel) {
-//            Optional<User> user = userRepository.findById(userModel.getId());
-//            if (user.isEmpty()) { throw new UsernameNotFoundException(userModel.getId().toString());}
-//            // convert to entity to get the encode password
-//            var update_user = userMapper.toEntity(userModel);
-//            var entity = user.get();
-//            entity.setPassword(update_user.getPassword());
-//            return userRepository.save(entity) != null;
-//        }
-//    }
+        return optionalUser;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = getUserByUserName(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException(username);
+        }
+        return new ApiUserDetails(user.get());
+    }
+
+    public User updatePassword(UserInputDTO inputDTO) {
+        Optional<User> user = userRepository.findByUsername(inputDTO.getUsername());
+        if (user.isEmpty()) {
+            throw new RecordNotFoundException("User not found");
+        }
+        // convert to entity to get the encode password
+        var update_user = userMapper.inputToUser(inputDTO);
+        var entity = user.get();
+        entity.setPassword(update_user.getPassword());
+        return userRepository.save(entity);
+    }
+
 }

@@ -4,9 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,11 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
         http
-                .httpBasic(hp -> hp.disable())
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        //Iedereen toestemming geven om endpoints te kunnen testen
-                        .requestMatchers("/**").permitAll()
-
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products").permitAll()
@@ -39,14 +36,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
                         .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
+                        .requestMatchers(HttpMethod.POST, "/designers").hasAnyAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
                         .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
-                        .requestMatchers("/users").permitAll()
-                        .requestMatchers("/users/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/users").permitAll()
+                        .requestMatchers("/users").authenticated()
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

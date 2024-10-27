@@ -1,6 +1,8 @@
 package com.crafter.crafttroveapi.DTOs.productDTO;
 
+import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
+import com.crafter.crafttroveapi.models.Designer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -12,6 +14,8 @@ import java.util.List;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductInputDTO {
+
+    private Designer designer;
 
     @NotEmpty(groups = CreateGroup.class, message = "What name would you like to give your pattern?")
     private String title;

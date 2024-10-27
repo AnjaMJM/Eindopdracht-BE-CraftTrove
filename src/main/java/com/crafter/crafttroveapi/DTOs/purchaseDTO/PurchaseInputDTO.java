@@ -1,6 +1,7 @@
 package com.crafter.crafttroveapi.DTOs.purchaseDTO;
 
 import com.crafter.crafttroveapi.models.Product;
+import com.crafter.crafttroveapi.models.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +15,12 @@ public class PurchaseInputDTO {
 
     @NotNull
     private Date date;
+    private User user;
 
     @NotNull
-    private Double totalPrice;
+    private double totalPrice;
 
     private List<Long> products;
+
+    private boolean payed;
 }

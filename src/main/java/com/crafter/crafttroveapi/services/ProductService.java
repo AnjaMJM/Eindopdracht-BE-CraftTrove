@@ -7,14 +7,12 @@ import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
-import com.crafter.crafttroveapi.models.Category;
-import com.crafter.crafttroveapi.models.Keyword;
-import com.crafter.crafttroveapi.models.Product;
-import com.crafter.crafttroveapi.repositories.CategoryRepository;
-import com.crafter.crafttroveapi.repositories.KeywordRepository;
-import com.crafter.crafttroveapi.repositories.ProductRepository;
+import com.crafter.crafttroveapi.models.*;
+import com.crafter.crafttroveapi.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,14 +27,18 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final KeywordRepository keywordRepository;
     private final ProductMapper productMapper;
+    private final UserRepository userRepository;
+    private final DesignerRepository designerRepository;
 
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository, DesignerRepository designerRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
         this.productMapper = productMapper;
+        this.userRepository = userRepository;
+        this.designerRepository = designerRepository;
     }
 
 
@@ -75,6 +77,17 @@ public class ProductService {
     }
 
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Designer> optionalUser = designerRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            Designer designer = optionalUser.get();
+            newProduct.setDesigner(designer);
+        } else {
+            throw new RecordNotFoundException("Designer not found");
+        }
+
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
@@ -84,11 +97,20 @@ public class ProductService {
 
     @CheckAvailability
     public ProductOutputDTO updateProduct(Long id, ProductInputDTO updatedProduct) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         Optional<Product> product = productRepository.findById(id);
         if (product.isPresent()) {
             Product existingProduct = product.get();
 
-// designer stays the same. check if needs to be added to list
+            Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+            if (optionalDesigner.isPresent()) {
+                Designer designer = optionalDesigner.get();
+                updatedProduct.setDesigner(designer);
+            } else {
+                throw new RecordNotFoundException("Designer not found");
+            }
             if (updatedProduct.getTitle() != null) {
 
                 if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
