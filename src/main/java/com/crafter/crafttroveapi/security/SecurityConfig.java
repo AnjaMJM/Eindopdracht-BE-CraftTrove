@@ -33,15 +33,23 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/designers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/keywords").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users").permitAll()
+
+                        .requestMatchers("/users").authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/purchase").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/designers").hasAnyAuthority("ROLE_USER")
+
                         .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
                         .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
-                        .requestMatchers(HttpMethod.POST, "/designers").hasAnyAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
                         .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
-                        .requestMatchers(HttpMethod.GET, "/users").permitAll()
-                        .requestMatchers("/users").authenticated()
-                        .anyRequest().denyAll()
+
+
+                        .anyRequest().authenticated()
+                        //anyRequest().denyAll()
+
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)

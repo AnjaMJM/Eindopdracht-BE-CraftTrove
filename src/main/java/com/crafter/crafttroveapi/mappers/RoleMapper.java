@@ -15,7 +15,7 @@ public class RoleMapper {
         if (role == null) {
             return null;
         }
-        RoleDTO dto = new RoleDTO(role.getId());
+        RoleDTO dto = new RoleDTO();
         dto.setName(role.getName());
         dto.setActive(role.isActive());
         return dto;

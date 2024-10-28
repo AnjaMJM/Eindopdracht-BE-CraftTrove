@@ -14,8 +14,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private RoleEnum name;
+//    @Enumerated(EnumType.STRING)
+    private String name;
 
     @Column(columnDefinition = "boolean default true")
     private boolean isActive = true;
@@ -23,7 +23,7 @@ public class Role {
     public Role() {
     }
 
-    public Role(RoleEnum name) {
+    public Role(String name) {
         this.name = name;
     }
 

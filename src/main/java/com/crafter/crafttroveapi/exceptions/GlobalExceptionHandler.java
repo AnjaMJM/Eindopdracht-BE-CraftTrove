@@ -64,8 +64,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorObject, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = AuthenticationFailedException.class)
-    public ResponseEntity<ErrorObject> handleAuthenticationError(AuthenticationFailedException exception) {
+    @ExceptionHandler(value = FailToAuthenticateException.class)
+    public ResponseEntity<ErrorObject> handleAuthenticationError(FailToAuthenticateException exception) {
         ErrorObject errorObject = new ErrorObject();
 
         errorObject.setStatusCode(HttpStatus.UNAUTHORIZED.value());

@@ -41,7 +41,6 @@ public class ProductService {
         this.designerRepository = designerRepository;
     }
 
-
     public List<ProductOutputDTO> getAllProducts() {
         List<Product> products = productRepository.findAllAvailableProducts();
         List<ProductOutputDTO> dtos = new ArrayList<>();
@@ -76,16 +75,17 @@ public class ProductService {
         return productMapper.ListProductToOutput(keyword.getProducts());
     }
 
+
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        Optional<Designer> optionalUser = designerRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            Designer designer = optionalUser.get();
+        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+        if (optionalDesigner.isPresent()) {
+            Designer designer = optionalDesigner.get();
             newProduct.setDesigner(designer);
         } else {
-            throw new RecordNotFoundException("Designer not found");
+            throw new RecordNotFoundException("There is no designer account for user " + username);
         }
 
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
@@ -95,85 +95,91 @@ public class ProductService {
         return productMapper.productToOutput(p);
     }
 
-    @CheckAvailability
+
     public ProductOutputDTO updateProduct(Long id, ProductInputDTO updatedProduct) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+        if (optionalDesigner.isPresent()) {
+            Designer designer = optionalDesigner.get();
+            Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+            if (product.isPresent()) {
+                Product existingProduct = product.get();
 
-        Optional<Product> product = productRepository.findById(id);
-        if (product.isPresent()) {
-            Product existingProduct = product.get();
+                if (updatedProduct.getTitle() != null) {
 
-            Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
-            if (optionalDesigner.isPresent()) {
-                Designer designer = optionalDesigner.get();
-                updatedProduct.setDesigner(designer);
+                    if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
+                        throw new DuplicateRecordException("A product with this name already exists");
+                    } else {
+                        existingProduct.setTitle(updatedProduct.getTitle());
+                    }
+
+                }
+                if (updatedProduct.getDescription() != null) {
+                    existingProduct.setDescription(updatedProduct.getDescription());
+                }
+                if (updatedProduct.getPrice() != null) {
+                    existingProduct.setPrice(updatedProduct.getPrice());
+                }
+                if (updatedProduct.getThumbnail() != null) {
+                    existingProduct.setThumbnail(updatedProduct.getThumbnail());
+                }
+                if (updatedProduct.getPhotos() != null) {
+                    existingProduct.setPhotos(updatedProduct.getPhotos());
+                }
+                if (updatedProduct.getPattern() != null) {
+                    existingProduct.setPattern(updatedProduct.getPattern());
+                }
+                if (updatedProduct.getCategoryList() != null) {
+                    List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
+                    existingProduct.setCategories(categories);
+                }
+                if (updatedProduct.getKeywordList() != null) {
+                    List<Keyword> keywords = new ArrayList<>();
+                    for (String keywordName : updatedProduct.getKeywordList()) {
+                        Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+                                .orElseGet(() -> {
+                                    Keyword newKeyword = new Keyword();
+                                    newKeyword.setName(keywordName);
+                                    return keywordRepository.save(newKeyword);
+                                });
+                        keywords.add(keyword);
+                    }
+                    existingProduct.setKeywords(keywords);
+                }
+                if (updatedProduct.getIsAvailable() != null) {
+                    existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
+                }
+                Product savedProduct = productRepository.save(existingProduct);
+                return productMapper.productToOutput(savedProduct);
+
             } else {
-                throw new RecordNotFoundException("Designer not found");
+                throw new RecordNotFoundException("This product does not exist in your shop");
             }
-            if (updatedProduct.getTitle() != null) {
-
-                if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
-                    throw new DuplicateRecordException("A product with this name already exists");
-                } else {
-                    existingProduct.setTitle(updatedProduct.getTitle());
-                }
-
-            }
-            if (updatedProduct.getDescription() != null) {
-                existingProduct.setDescription(updatedProduct.getDescription());
-            }
-            if (updatedProduct.getPrice() != null) {
-                existingProduct.setPrice(updatedProduct.getPrice());
-            }
-            if (updatedProduct.getThumbnail() != null) {
-                existingProduct.setThumbnail(updatedProduct.getThumbnail());
-            }
-            if (updatedProduct.getPhotos() != null) {
-                existingProduct.setPhotos(updatedProduct.getPhotos());
-            }
-            if (updatedProduct.getPattern() != null) {
-                existingProduct.setPattern(updatedProduct.getPattern());
-            }
-            if (updatedProduct.getCategoryList() != null) {
-                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
-                existingProduct.setCategories(categories);
-            }
-            if (updatedProduct.getKeywordList() != null) {
-                List<Keyword> keywords = new ArrayList<>();
-                for (String keywordName : updatedProduct.getKeywordList()) {
-                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
-                            .orElseGet(() -> {
-                                Keyword newKeyword = new Keyword();
-                                newKeyword.setName(keywordName);
-                                return keywordRepository.save(newKeyword);
-                            });
-                    keywords.add(keyword);
-                }
-                existingProduct.setKeywords(keywords);
-            }
-            if (updatedProduct.getIsAvailable() != null) {
-                existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
-            }
-            Product savedProduct = productRepository.save(existingProduct);
-            return productMapper.productToOutput(savedProduct);
         } else {
-            throw new RecordNotFoundException("This product does not exist");
+            throw new RecordNotFoundException("Designer not found");
         }
     }
 
 
     @Transactional
     @CheckAvailability
-    public void deleteProduct(Long productId) {
-        Optional<Product> optionalProduct = productRepository.findById(productId);
-        if (optionalProduct.isPresent()) {
-            Product product = optionalProduct.get();
+    public void deleteProduct(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+        if (optionalDesigner.isPresent()) {
+            Designer designer = optionalDesigner.get();
+            Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+            if (product.isPresent()) {
+                Product existingProduct = product.get();
 
-            product.setIsAvailable(false);
+                existingProduct.setIsAvailable(false);
 
-        } else {
-            throw new RecordNotFoundException("Product with productId " + productId + " not found");
+            } else {
+                throw new RecordNotFoundException("This product does not exist in your shop");
+            }
         }
+
     }
 }

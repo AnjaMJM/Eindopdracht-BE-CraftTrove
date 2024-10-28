@@ -3,18 +3,17 @@ package com.crafter.crafttroveapi.controllers;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserLoginRequestDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
-import com.crafter.crafttroveapi.exceptions.AuthenticationFailedException;
-import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
-import com.crafter.crafttroveapi.models.User;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import com.crafter.crafttroveapi.security.JwtService;
 import com.crafter.crafttroveapi.services.UserService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,8 +46,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO
     ) {
-
-
         UsernamePasswordAuthenticationToken up =
                 new UsernamePasswordAuthenticationToken(userLoginRequestDTO.getUsername(), userLoginRequestDTO.getPassword());
 
@@ -60,8 +57,8 @@ public class AuthController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .body("Login successful, Token generated");
-        } catch (AuthenticationFailedException ex) {
-            throw new AuthenticationFailedException("Username and password don't match");
+        } catch (AuthenticationException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
     }

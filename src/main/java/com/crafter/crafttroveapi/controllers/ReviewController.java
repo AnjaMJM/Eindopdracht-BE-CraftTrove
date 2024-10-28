@@ -26,11 +26,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     private final ProductService productService;
-    private Authentication authentication;
 
-    private void setAuthentication(SecurityContext context) {
-        this.authentication =context.getAuthentication();
-    }
 
     @Autowired
     public ReviewController(ReviewService reviewService, ProductService productService) {
@@ -40,8 +36,6 @@ public class ReviewController {
 
     @PostMapping("/products/{id}/review")
     public ResponseEntity<ReviewOutputDTO> createNewReview(@PathVariable Long id, @RequestBody ReviewInputDTO newReview) {
-        setAuthentication(SecurityContextHolder.getContext());
-
         ReviewOutputDTO createdReview = reviewService.createReview(newReview, id);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

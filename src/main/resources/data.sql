@@ -31,9 +31,12 @@ VALUES (1001, 'alicewalker', '$2a$12$MU.EA3cAWvRVhX/ujco2OOtbp.4RwuhncKRBJqsJm1J
        (1004, 'davidbrown', ' $2a$12$ZzW29rNM86p6TnIrXAEoiefD/8YVauZCkK0H7kCbnSIPhwj/IEPpe ', 'david@brownsweaving.com',
         true),
        (1005, 'crafty user', '$2a$12$GL97deK465zp4.N2lDis7.XI86h/RLVqVHb9VpgXtCA2NBxhyTd7G', 'user@crafttrove.com',
-        false), --ww: wachtwoord
+        false),                           --ww: wachtwoord
        (1006, 'dreamy designer', '$2a$12$x/mwrBmtw1trzIInzsIZY.pKS0hKq/qgVhCBacrPHvA85cWpLGAMq',
-        'designer@crafttrove.com', true); --ww: wachtwoord
+        'designer@crafttrove.com', true), --ww: wachtwoord
+       (1007, 'active admin', '$2a$12$DiwMtidnlOvDbOOPRjn0AuMjhVUdAX/Yw3j07dHLpo2aFgyZOCqkS', 'admin@crafttrove.com',
+        false);
+--ww: wachtwoord
 
 -- Designers Table
 INSERT INTO designers (id, brand_name, brand_logo, brand_description)
@@ -81,6 +84,11 @@ VALUES (1001, 1001, 1001, 'Great pattern, very clear instructions!', 5, '2023-01
        (1002, 1002, 1002, 'Functional and stylish, love it!', 4, '2023-02-20'),
        (1003, 1003, 1003, 'Beautiful design but a bit pricey.', 3, '2023-03-15');
 
+INSERT INTO roles (id, name, is_active)
+VALUES (1001, 'ROLE_USER', true),
+       (1002, 'ROLE_DESIGNER', true),
+       (1003, 'ROLE_ADMIN', true);
+
 -- User Preferences (Categories)
 INSERT INTO user_categories (user_id, category_id)
 VALUES (1001, 1),
@@ -97,6 +105,21 @@ VALUES (1001, 1003),
        (1001, 1005),
        (1006, 1001),
        (1006, 1004);
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES (1001, 1001),
+       (1001, 1002),
+       (1002, 1001),
+       (1002, 1002),
+       (1003, 1001),
+       (1003, 1002),
+       (1004, 1001),
+       (1004, 1002),
+       (1005, 1001),
+       (1006, 1001),
+       (1006, 1002),
+       (1007, 1001),
+       (1007, 1003);
 
 -- Products Categories Table
 INSERT INTO products_categories (product_id, category_id)

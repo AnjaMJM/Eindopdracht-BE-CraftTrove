@@ -60,7 +60,7 @@ public class DesignerService {
             user.setDesigner(true);
             Set<Role> roleSet = user.getRoles();
             Role designerRole = new Role();
-            designerRole.setName(RoleEnum.ROLE_DESIGNER);
+            designerRole.setName("ROLE_DESIGNER");
             roleSet.add(designerRole);
             user.setRoles(roleSet);
         } else {
