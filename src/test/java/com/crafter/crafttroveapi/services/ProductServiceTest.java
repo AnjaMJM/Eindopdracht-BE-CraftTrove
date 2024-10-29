@@ -5,18 +5,20 @@ import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
-import com.crafter.crafttroveapi.models.Category;
-import com.crafter.crafttroveapi.models.Keyword;
-import com.crafter.crafttroveapi.models.Product;
-import com.crafter.crafttroveapi.repositories.CategoryRepository;
-import com.crafter.crafttroveapi.repositories.KeywordRepository;
-import com.crafter.crafttroveapi.repositories.ProductRepository;
+import com.crafter.crafttroveapi.models.*;
+import com.crafter.crafttroveapi.repositories.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -36,17 +39,19 @@ class ProductServiceTest {
 
     @Mock
     ProductRepository repository;
-
+    @Mock
+    ProductMapper mapper;
     @Mock
     CategoryRepository categoryRepository;
-
+    @Mock
+    DesignerRepository designerRepository;
     @Mock
     KeywordRepository keywordRepository;
 
-    @Mock
-    ProductMapper mapper;
 
-
+    private Authentication authentication;
+    private SecurityContext securityContext;
+    private Designer user;
     private Product item1;
     private Product item2;
     private Product item3;
@@ -60,6 +65,12 @@ class ProductServiceTest {
 
     @BeforeEach
     void setup() {
+        authentication = Mockito.mock(Authentication.class);
+        securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+
+        user = new Designer();
+        user.setUsername(authentication.getName());
 
         item1 = new Product();
         item1.setId(1L);
@@ -67,13 +78,11 @@ class ProductServiceTest {
         item1.setDescription("a fun pattern to make");
         item1.setPattern("pattern.pdf");
 
-
         item2 = new Product();
         item2.setId(2L);
         item2.setTitle("cute pattern");
         item2.setDescription("a cute pattern to make");
         item2.setPattern("pattern.pdf");
-
 
         item3 = new Product();
         item3.setId(3L);
@@ -106,7 +115,11 @@ class ProductServiceTest {
 
         outputDTOList = new ArrayList<>();
         outputDTOList.add(outputDto);
+    }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -141,7 +154,7 @@ class ProductServiceTest {
         //Act
         List<ProductOutputDTO> output = service.getProductsByCategory("category");
         //Assert
-       assertThat(output.size()).isEqualTo(1);
+        assertThat(output.size()).isEqualTo(1);
     }
 
     @Test
@@ -151,7 +164,7 @@ class ProductServiceTest {
         //Act
 
         //Assert
-        assertThrows(RecordNotFoundException.class, ()-> service.getProductsByCategory("category"));
+        assertThrows(RecordNotFoundException.class, () -> service.getProductsByCategory("category"));
     }
 
     @Test
@@ -171,12 +184,16 @@ class ProductServiceTest {
         when(keywordRepository.findByNameIgnoreCase("keyword")).thenReturn(Optional.empty());
         //Act
         //Assert
-        assertThrows(RecordNotFoundException.class, ()-> service.getProductsByKeywords("keyword"));
+        assertThrows(RecordNotFoundException.class, () -> service.getProductsByKeywords("keyword"));
     }
 
     @Test
+    @WithMockUser
     void canCreateProduct() {
         //Arrange
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("mockUser");
+        when(designerRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(mapper.inputToProduct(inputDto)).thenReturn(item1);
         when(repository.save(item1)).thenReturn(item1);
         when(mapper.productToOutput(item1)).thenReturn(outputDto);
@@ -190,12 +207,16 @@ class ProductServiceTest {
     }
 
     @Test
+    @WithMockUser
     void checkTitleDuplicity() {
         //Arrange
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("mockUser");
+        when(designerRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(repository.existsByTitleIgnoreCase("fun pattern")).thenThrow(DuplicateRecordException.class);
         //Act
         //Assert
-        assertThrows(DuplicateRecordException.class, ()-> service.createNewProduct(inputDto));
+        assertThrows(DuplicateRecordException.class, () -> service.createNewProduct(inputDto));
     }
 
 }

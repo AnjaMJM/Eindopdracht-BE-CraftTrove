@@ -47,8 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
 
 
-                        .anyRequest().authenticated()
-                        //anyRequest().denyAll()
+
+                        .anyRequest().denyAll()
 
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
