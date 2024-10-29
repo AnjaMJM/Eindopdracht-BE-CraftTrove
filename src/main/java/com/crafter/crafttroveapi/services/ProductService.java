@@ -7,14 +7,12 @@ import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
-import com.crafter.crafttroveapi.models.Category;
-import com.crafter.crafttroveapi.models.Keyword;
-import com.crafter.crafttroveapi.models.Product;
-import com.crafter.crafttroveapi.repositories.CategoryRepository;
-import com.crafter.crafttroveapi.repositories.KeywordRepository;
-import com.crafter.crafttroveapi.repositories.ProductRepository;
+import com.crafter.crafttroveapi.models.*;
+import com.crafter.crafttroveapi.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,16 +27,19 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final KeywordRepository keywordRepository;
     private final ProductMapper productMapper;
+    private final UserRepository userRepository;
+    private final DesignerRepository designerRepository;
 
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository, DesignerRepository designerRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
         this.productMapper = productMapper;
+        this.userRepository = userRepository;
+        this.designerRepository = designerRepository;
     }
-
 
     public List<ProductOutputDTO> getAllProducts() {
         List<Product> products = productRepository.findAllAvailableProducts();
@@ -74,7 +75,19 @@ public class ProductService {
         return productMapper.ListProductToOutput(keyword.getProducts());
     }
 
+
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+        if (optionalDesigner.isPresent()) {
+            Designer designer = optionalDesigner.get();
+            newProduct.setDesigner(designer);
+        } else {
+            throw new RecordNotFoundException("There is no designer account for user " + username);
+        }
+
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
@@ -82,76 +95,91 @@ public class ProductService {
         return productMapper.productToOutput(p);
     }
 
-    @CheckAvailability
+
     public ProductOutputDTO updateProduct(Long id, ProductInputDTO updatedProduct) {
-        Optional<Product> product = productRepository.findById(id);
-        if (product.isPresent()) {
-            Product existingProduct = product.get();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+        if (optionalDesigner.isPresent()) {
+            Designer designer = optionalDesigner.get();
+            Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+            if (product.isPresent()) {
+                Product existingProduct = product.get();
 
-// designer stays the same. check if needs to be added to list
-            if (updatedProduct.getTitle() != null) {
+                if (updatedProduct.getTitle() != null) {
 
-                if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
-                    throw new DuplicateRecordException("A product with this name already exists");
-                } else {
-                    existingProduct.setTitle(updatedProduct.getTitle());
+                    if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
+                        throw new DuplicateRecordException("A product with this name already exists");
+                    } else {
+                        existingProduct.setTitle(updatedProduct.getTitle());
+                    }
+
                 }
-
-            }
-            if (updatedProduct.getDescription() != null) {
-                existingProduct.setDescription(updatedProduct.getDescription());
-            }
-            if (updatedProduct.getPrice() != null) {
-                existingProduct.setPrice(updatedProduct.getPrice());
-            }
-            if (updatedProduct.getThumbnail() != null) {
-                existingProduct.setThumbnail(updatedProduct.getThumbnail());
-            }
-            if (updatedProduct.getPhotos() != null) {
-                existingProduct.setPhotos(updatedProduct.getPhotos());
-            }
-            if (updatedProduct.getPattern() != null) {
-                existingProduct.setPattern(updatedProduct.getPattern());
-            }
-            if (updatedProduct.getCategoryList() != null) {
-                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
-                existingProduct.setCategories(categories);
-            }
-            if (updatedProduct.getKeywordList() != null) {
-                List<Keyword> keywords = new ArrayList<>();
-                for (String keywordName : updatedProduct.getKeywordList()) {
-                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
-                            .orElseGet(() -> {
-                                Keyword newKeyword = new Keyword();
-                                newKeyword.setName(keywordName);
-                                return keywordRepository.save(newKeyword);
-                            });
-                    keywords.add(keyword);
+                if (updatedProduct.getDescription() != null) {
+                    existingProduct.setDescription(updatedProduct.getDescription());
                 }
-                existingProduct.setKeywords(keywords);
+                if (updatedProduct.getPrice() != null) {
+                    existingProduct.setPrice(updatedProduct.getPrice());
+                }
+                if (updatedProduct.getThumbnail() != null) {
+                    existingProduct.setThumbnail(updatedProduct.getThumbnail());
+                }
+                if (updatedProduct.getPhotos() != null) {
+                    existingProduct.setPhotos(updatedProduct.getPhotos());
+                }
+                if (updatedProduct.getPattern() != null) {
+                    existingProduct.setPattern(updatedProduct.getPattern());
+                }
+                if (updatedProduct.getCategoryList() != null) {
+                    List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
+                    existingProduct.setCategories(categories);
+                }
+                if (updatedProduct.getKeywordList() != null) {
+                    List<Keyword> keywords = new ArrayList<>();
+                    for (String keywordName : updatedProduct.getKeywordList()) {
+                        Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+                                .orElseGet(() -> {
+                                    Keyword newKeyword = new Keyword();
+                                    newKeyword.setName(keywordName);
+                                    return keywordRepository.save(newKeyword);
+                                });
+                        keywords.add(keyword);
+                    }
+                    existingProduct.setKeywords(keywords);
+                }
+                if (updatedProduct.getIsAvailable() != null) {
+                    existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
+                }
+                Product savedProduct = productRepository.save(existingProduct);
+                return productMapper.productToOutput(savedProduct);
+
+            } else {
+                throw new RecordNotFoundException("This product does not exist in your shop");
             }
-            if (updatedProduct.getIsAvailable() != null) {
-                existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
-            }
-            Product savedProduct = productRepository.save(existingProduct);
-            return productMapper.productToOutput(savedProduct);
         } else {
-            throw new RecordNotFoundException("This product does not exist");
+            throw new RecordNotFoundException("Designer not found");
         }
     }
 
 
     @Transactional
     @CheckAvailability
-    public void deleteProduct(Long productId) {
-        Optional<Product> optionalProduct = productRepository.findById(productId);
-        if (optionalProduct.isPresent()) {
-            Product product = optionalProduct.get();
+    public void deleteProduct(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
+        if (optionalDesigner.isPresent()) {
+            Designer designer = optionalDesigner.get();
+            Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+            if (product.isPresent()) {
+                Product existingProduct = product.get();
 
-            product.setIsAvailable(false);
+                existingProduct.setIsAvailable(false);
 
-        } else {
-            throw new RecordNotFoundException("Product with productId " + productId + " not found");
+            } else {
+                throw new RecordNotFoundException("This product does not exist in your shop");
+            }
         }
+
     }
 }

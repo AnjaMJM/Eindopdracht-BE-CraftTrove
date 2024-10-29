@@ -21,10 +21,6 @@ public class UserOutputDTO {
     private boolean isDesigner;
     private Set<RoleDTO> roles;
 
-    private String password;
-
-    // Onderstaande toevoegen aan mappers en uitzoeken waar en hoe ze verder gebruikt worden
-
     private boolean expired;
 
     private boolean locked;

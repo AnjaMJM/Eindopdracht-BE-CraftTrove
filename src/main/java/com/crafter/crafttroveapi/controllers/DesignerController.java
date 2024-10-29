@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-
+@RequestMapping("/designers")
 public class DesignerController {
 
     private final DesignerService designerService;
@@ -33,23 +33,18 @@ public class DesignerController {
         this.authentication =context.getAuthentication();
     }
 
-    @GetMapping("/designers")
+    @GetMapping()
     public ResponseEntity<List<DesignerOutputDTO>> getAllDesigners(){
         return ResponseEntity.ok(designerService.getAllDesigners());
     }
 
-    @GetMapping("/designers/{id}")
-    public ResponseEntity<DesignerOutputDTO> getDesignerById(@PathVariable Long id) {
-        return ResponseEntity.ok(designerService.getDesignerById(id));
-    }
-
-    @GetMapping("/designers/{name}")
+    @GetMapping("/{name}")
     public ResponseEntity<DesignerOutputDTO> getDesignerByBrandname(@PathVariable String name) {
         return ResponseEntity.ok(designerService.getDesignersByBrandname(name));
     }
 
-    @PostMapping("/user/{id}/designer")
-    public ResponseEntity<DesignerOutputDTO> createNewDesigner(@RequestBody @Validated(CreateGroup.class) DesignerInputDTO newDesigner, @PathVariable("id") Long userId) {
+    @PostMapping()
+    public ResponseEntity<DesignerOutputDTO> createNewDesigner(@RequestBody @Validated(CreateGroup.class) DesignerInputDTO newDesigner) {
         setAuthentication(SecurityContextHolder.getContext());
         DesignerOutputDTO createdDesigner = designerService.createNewDesigner(newDesigner);
         URI location = ServletUriComponentsBuilder
@@ -60,14 +55,14 @@ public class DesignerController {
         return ResponseEntity.created(location).body(createdDesigner);
     }
 
-    @PutMapping("/user/{id}/designer/{name}")
-    public ResponseEntity<DesignerOutputDTO> updateDesigner(@PathVariable String name, @PathVariable Long id, @RequestBody @Validated(UpdateGroup.class) DesignerInputDTO updatedDesigner){
+    @PutMapping("/{name}")
+    public ResponseEntity<DesignerOutputDTO> updateDesigner(@PathVariable String name, @RequestBody @Validated(UpdateGroup.class) DesignerInputDTO updatedDesigner){
         setAuthentication(SecurityContextHolder.getContext());
         DesignerOutputDTO update = designerService.updateDesigner(name, updatedDesigner);
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/user/{id}/designer/{name}")
+    @DeleteMapping("/{name}")
     public ResponseEntity<String> deleteDesigner(@PathVariable String name, @PathVariable Long id) {
         setAuthentication(SecurityContextHolder.getContext());
         designerService.deleteDesigner(name);

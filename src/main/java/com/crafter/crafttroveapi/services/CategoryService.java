@@ -4,6 +4,7 @@ import com.crafter.crafttroveapi.DTOs.categoryDTO.CategoryOutputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
+import com.crafter.crafttroveapi.mappers.CategoryMapper;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
@@ -12,15 +13,15 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.crafter.crafttroveapi.mappers.CategoryMapper.CategoryToOutput;
-
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     public List<CategoryOutputDTO> getAllCategories(){
@@ -28,10 +29,7 @@ public class CategoryService {
         List<CategoryOutputDTO> dtos = new ArrayList<>();
 
         for(Category category:categories) {
-            if(category.getProducts().stream()
-                    .anyMatch(Product::getIsAvailable)) {
-                dtos.add(CategoryToOutput(category));
-            }
+                dtos.add(categoryMapper.categoryToOutput(category));
         }
         return dtos;
     }
@@ -41,6 +39,6 @@ public class CategoryService {
         Category category = categoryRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new RecordNotFoundException("Category not found with name " + name));
 
-       return CategoryToOutput(category);
+       return categoryMapper.categoryToOutput(category);
     }
 }

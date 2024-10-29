@@ -24,7 +24,7 @@ public class ApiUserDetails implements UserDetails {
         user.setUsername(username);
 
         for (String role : roles) {
-            user.getRoles().add(new Role());
+            user.getRoles().add(new Role(role));
         }
     }
 

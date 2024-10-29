@@ -1,18 +1,11 @@
 package com.crafter.crafttroveapi.controllers;
 
-import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
-import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
 import com.crafter.crafttroveapi.services.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -24,5 +17,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<UserOutputDTO>> getAllUsers(){
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<UserOutputDTO> getUserProfile(@PathVariable String name){
+        return ResponseEntity.ok(userService.getUserByUsername(name));
+    }
 }

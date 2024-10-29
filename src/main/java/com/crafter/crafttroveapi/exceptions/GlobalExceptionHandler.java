@@ -63,4 +63,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorObject, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = FailToAuthenticateException.class)
+    public ResponseEntity<ErrorObject> handleAuthenticationError(FailToAuthenticateException exception) {
+        ErrorObject errorObject = new ErrorObject();
+
+        errorObject.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        errorObject.setMessage(exception.getMessage());
+        errorObject.setTimestamp(new Date());
+
+        return new ResponseEntity<>(errorObject, HttpStatus.UNAUTHORIZED);
+    }
 }

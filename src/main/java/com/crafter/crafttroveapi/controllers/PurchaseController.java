@@ -23,8 +23,8 @@ public class PurchaseController {
         this.purchaseService = purchaseService;
     }
 
-    @PostMapping("user/{id}/purchase")
-    public ResponseEntity<PurchaseOutputDTO>  createNewPurchase(@PathVariable Long id, @RequestBody PurchaseInputDTO newPurchase) {
+    @PostMapping("purchase")
+    public ResponseEntity<PurchaseOutputDTO>  createNewPurchase( @RequestBody PurchaseInputDTO newPurchase) {
         PurchaseOutputDTO createdPurchase = purchaseService.createPurchase(newPurchase);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

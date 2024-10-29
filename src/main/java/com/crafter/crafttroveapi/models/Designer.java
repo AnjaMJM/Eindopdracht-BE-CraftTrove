@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 import java.util.List;
 
 @Entity
+@PrimaryKeyJoinColumn(name = "id")
 @Table(name = "designers")
 @Getter
 @Setter

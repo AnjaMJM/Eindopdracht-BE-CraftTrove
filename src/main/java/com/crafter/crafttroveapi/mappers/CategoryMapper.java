@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class CategoryMapper {
 
-    public static CategoryOutputDTO CategoryToOutput(Category category) {
+    public CategoryOutputDTO categoryToOutput(Category category) {
         CategoryOutputDTO dto = new CategoryOutputDTO();
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());

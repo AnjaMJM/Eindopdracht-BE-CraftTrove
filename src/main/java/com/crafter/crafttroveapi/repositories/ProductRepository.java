@@ -1,6 +1,7 @@
 package com.crafter.crafttroveapi.repositories;
 
 import com.crafter.crafttroveapi.models.Category;
+import com.crafter.crafttroveapi.models.Designer;
 import com.crafter.crafttroveapi.models.Keyword;
 import com.crafter.crafttroveapi.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,4 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByTitle(String title);
 
     List<Product> findByIdIn(List<Long> id);
+
+    Optional<Product> findByIdAndDesigner(Long id, Designer designer);
+
 }

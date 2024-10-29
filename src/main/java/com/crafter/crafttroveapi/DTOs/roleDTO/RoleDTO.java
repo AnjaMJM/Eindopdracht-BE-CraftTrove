@@ -8,15 +8,13 @@ import lombok.Setter;
 @Setter
 public class RoleDTO {
 
-    private Long id;
-
-    private RoleEnum name;
+    private String name;
 
     private boolean active;
 
-    public RoleDTO(){
-
+    public RoleDTO(String name) {
     }
-    public RoleDTO(Long id) {
+
+    public RoleDTO() {
     }
 }

@@ -1,5 +1,9 @@
 package com.crafter.crafttroveapi.repositories;
 
+import com.crafter.crafttroveapi.helpers.RoleEnum;
+import com.crafter.crafttroveapi.models.Designer;
+import com.crafter.crafttroveapi.models.Product;
+import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,4 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmail(String email);
     Optional<User> findByUsernameAndPassword(String username, String password);
+
 }

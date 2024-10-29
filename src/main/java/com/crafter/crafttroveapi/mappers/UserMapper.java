@@ -30,7 +30,6 @@ public class UserMapper {
         UserOutputDTO dto = new UserOutputDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
-        dto.setPassword(user.getPassword());
         dto.setEmail(user.getEmail());
         if (user.getPreferences() != null) {
             List<String> categoryList = new ArrayList<>();
@@ -44,7 +43,7 @@ public class UserMapper {
             for (Product product : user.getWishlist()) {
                 productList.add(product.getTitle());
             }
-            dto.setCategoryPreferences(productList);
+            dto.setProductWishlist(productList);
         }
         dto.setDesigner(user.isDesigner());
         dto.setExpired(user.isExpired());

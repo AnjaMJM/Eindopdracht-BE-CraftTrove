@@ -2,33 +2,34 @@ package com.crafter.crafttroveapi.services;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
-import com.crafter.crafttroveapi.helpers.CheckType;
+import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.mappers.DesignerMapper;
-import com.crafter.crafttroveapi.models.Category;
-import com.crafter.crafttroveapi.models.Designer;
-import com.crafter.crafttroveapi.models.Keyword;
-import com.crafter.crafttroveapi.models.Product;
+import com.crafter.crafttroveapi.models.*;
 import com.crafter.crafttroveapi.repositories.DesignerRepository;
+import com.crafter.crafttroveapi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DesignerService {
 
     private final DesignerRepository designerRepository;
+    private final UserRepository userRepository;
     private final DesignerMapper designerMapper;
 
-    public DesignerService(DesignerRepository designerRepository, DesignerMapper designerMapper) {
+    public DesignerService(DesignerRepository designerRepository, UserRepository userRepository, DesignerMapper designerMapper) {
         this.designerRepository = designerRepository;
+        this.userRepository = userRepository;
         this.designerMapper = designerMapper;
     }
 
@@ -42,13 +43,6 @@ public class DesignerService {
         return dtos;
     }
 
-    public DesignerOutputDTO getDesignerById(Long id) {
-        Designer designer = designerRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Designer not found"));
-
-        return designerMapper.designerToOutput(designer);
-    }
-
     public DesignerOutputDTO getDesignersByBrandname(String name) {
         Designer designer = designerRepository.findDesignerByBrandNameIgnoreCase(name)
                 .orElseThrow(() -> new RecordNotFoundException("Designer not found"));
@@ -56,16 +50,33 @@ public class DesignerService {
         return designerMapper.designerToOutput(designer);
     }
 
-    public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner ) {//Long userId
+    public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setDesigner(true);
+            Set<Role> roleSet = user.getRoles();
+            Role designerRole = new Role();
+            designerRole.setName("ROLE_DESIGNER");
+            roleSet.add(designerRole);
+            user.setRoles(roleSet);
+        } else {
+            throw new RecordNotFoundException("User not found with username: " + username);
+        }
+
         if (designerRepository.existsByBrandNameIgnoreCase(newDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
         }
-        // Voorwaarde toevoegen: user.isDesigner == true
+
         Designer designer = designerRepository.save(designerMapper.inputToDesigner(newDesigner));
         return designerMapper.designerToOutput(designer);
     }
 
     public DesignerOutputDTO updateDesigner(String name, DesignerInputDTO updatedDesigner) {
+
         Optional<Designer> designer = designerRepository.findDesignerByBrandNameIgnoreCase(name);
         if (designer.isPresent()) {
             Designer existingDesigner = designer.get();

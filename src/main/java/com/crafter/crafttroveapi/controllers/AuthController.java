@@ -54,12 +54,12 @@ public class AuthController {
 
             var ud = (ApiUserDetails) auth.getPrincipal();
             String token = jwtService.generateToken(ud);
-
             return ResponseEntity.ok()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                    .body("Token generated");
+                    .header(HttpHeaders.AUTHORIZATION, token)
+                    .body("Login successful, Token generated");
         } catch (AuthenticationException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+
     }
 }

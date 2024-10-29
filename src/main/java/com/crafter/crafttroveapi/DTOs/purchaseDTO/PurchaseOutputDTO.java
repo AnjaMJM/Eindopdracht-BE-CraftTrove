@@ -1,6 +1,5 @@
 package com.crafter.crafttroveapi.DTOs.purchaseDTO;
 
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +11,9 @@ import java.util.List;
 public class PurchaseOutputDTO {
 
     private Long id;
+    private String username;
     private Date date;
-    private Double totalPrice;
+    private double totalPrice;
     private List<String> products;
+    private boolean isPayed;
 }
