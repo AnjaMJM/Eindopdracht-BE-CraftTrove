@@ -18,11 +18,12 @@ public class Designer extends User {
     @Column(nullable = false, unique = true)
     private String brandName;
 
-    private String brandLogo;
+    @OneToOne
+    @JoinColumn(name = "logo_file", referencedColumnName = "name")
+    private File brandLogo;
 
     private String brandDescription;
 
     @OneToMany(mappedBy = "designer", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Product> products;
-
 }
