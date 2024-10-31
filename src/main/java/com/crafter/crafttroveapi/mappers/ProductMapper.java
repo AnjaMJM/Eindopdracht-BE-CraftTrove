@@ -2,6 +2,7 @@ package com.crafter.crafttroveapi.mappers;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
+import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.models.Keyword;
 import com.crafter.crafttroveapi.models.Product;
@@ -38,7 +39,7 @@ public class ProductMapper {
         dto.setPrice(product.getPrice());
         dto.setIsAvailable(product.getIsAvailable());
         dto.setThumbnail(product.getThumbnail());
-        dto.setPattern(product.getPattern());
+        dto.setPattern(product.getPatternFile());
         dto.setPhotos(product.getPhotos());
         dto.setDesigner(designerMapper.designerToOutput(product.getDesigner()));
         if (product.getCategories() != null) {
@@ -74,7 +75,38 @@ public class ProductMapper {
         product.setIsAvailable(inputDTO.getIsAvailable());
         product.setThumbnail(inputDTO.getThumbnail());
         product.setPhotos(inputDTO.getPhotos());
-        product.setPattern(inputDTO.getPattern());
+        product.setPatternFile(inputDTO.getPattern());
+        product.setDesigner(inputDTO.getDesigner());
+        if (inputDTO.getCategoryList() != null) {
+            List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
+            product.setCategories(categories);
+        }
+        if (inputDTO.getKeywordList() != null) {
+            List<Keyword> keywords = new ArrayList<>();
+            for (String keywordName : inputDTO.getKeywordList()) {
+                Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
+                        .orElseGet(() -> {
+                            Keyword newKeyword = new Keyword();
+                            newKeyword.setName(keywordName);
+                            return keywordRepository.save(newKeyword);
+                        });
+                keywords.add(keyword);
+            }
+            product.setKeywords(keywords);
+        }
+        return product;
+    }
+
+    public Product patchToProduct(ProductPatchInputDTO inputDTO) {
+        Product product = new Product();
+
+        product.setTitle(inputDTO.getTitle());
+        product.setDescription(inputDTO.getDescription());
+        product.setPrice(inputDTO.getPrice());
+        product.setIsAvailable(inputDTO.getIsAvailable());
+        product.setThumbnail(inputDTO.getThumbnail());
+        product.setPhotos(inputDTO.getPhotos());
+        product.setPatternFile(inputDTO.getPattern());
         product.setDesigner(inputDTO.getDesigner());
         if (inputDTO.getCategoryList() != null) {
             List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());

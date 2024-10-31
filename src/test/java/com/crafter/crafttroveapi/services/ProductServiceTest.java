@@ -51,7 +51,9 @@ class ProductServiceTest {
 
     private Authentication authentication;
     private SecurityContext securityContext;
-    private Designer user;
+
+    private User user;
+    private Designer designer;
     private Product item1;
     private Product item2;
     private Product item3;
@@ -69,26 +71,27 @@ class ProductServiceTest {
         securityContext = Mockito.mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
 
-        user = new Designer();
+        // Aangepast na designer en user 1-op-1 relatie te maken. check of nodig is.
+        user = new User();
         user.setUsername(authentication.getName());
 
         item1 = new Product();
         item1.setId(1L);
         item1.setTitle("fun pattern");
         item1.setDescription("a fun pattern to make");
-        item1.setPattern("pattern.pdf");
+        item1.setPatternFile("pattern.pdf");
 
         item2 = new Product();
         item2.setId(2L);
         item2.setTitle("cute pattern");
         item2.setDescription("a cute pattern to make");
-        item2.setPattern("pattern.pdf");
+        item2.setPatternFile("pattern.pdf");
 
         item3 = new Product();
         item3.setId(3L);
         item3.setTitle("cute pattern");
         item3.setDescription("a cute pattern to make");
-        item3.setPattern("pattern.pdf");
+        item3.setPatternFile("pattern.pdf");
 
         productList = new ArrayList<>();
         productList.add(item1);
@@ -103,14 +106,14 @@ class ProductServiceTest {
         inputDto = new ProductInputDTO();
         inputDto.setTitle(item1.getTitle());
         inputDto.setDescription(item1.getDescription());
-        inputDto.setPattern(item1.getPattern());
+        inputDto.setPattern(item1.getPatternFile());
         inputDto.setCategoryList(List.of("category"));
 
         outputDto = new ProductOutputDTO();
         outputDto.setId(item1.getId());
         outputDto.setTitle(item1.getTitle());
         outputDto.setDescription(item1.getDescription());
-        outputDto.setPattern(item1.getPattern());
+        outputDto.setPattern(item1.getPatternFile());
         outputDto.setCategoryList(List.of("category"));
 
         outputDTOList = new ArrayList<>();
@@ -143,7 +146,7 @@ class ProductServiceTest {
         assertEquals(item1.getId(), output.getId());
         assertEquals(item1.getTitle(), output.getTitle());
         assertEquals(item1.getDescription(), output.getDescription());
-        assertEquals(item1.getPattern(), output.getPattern());
+        assertEquals(item1.getPatternFile(), output.getPattern());
     }
 
     @Test
@@ -193,7 +196,7 @@ class ProductServiceTest {
         //Arrange
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("mockUser");
-        when(designerRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(designerRepository.findByBrandName(anyString())).thenReturn(Optional.of(designer));
         when(mapper.inputToProduct(inputDto)).thenReturn(item1);
         when(repository.save(item1)).thenReturn(item1);
         when(mapper.productToOutput(item1)).thenReturn(outputDto);
@@ -212,7 +215,7 @@ class ProductServiceTest {
         //Arrange
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("mockUser");
-        when(designerRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(designerRepository.findByBrandName(anyString())).thenReturn(Optional.of(designer));
         when(repository.existsByTitleIgnoreCase("fun pattern")).thenThrow(DuplicateRecordException.class);
         //Act
         //Assert

@@ -33,7 +33,7 @@ public class Product {
     private List<String> photos;
 
     @Column(nullable = false)
-    private String pattern;
+    private String patternFile;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "designer_id")

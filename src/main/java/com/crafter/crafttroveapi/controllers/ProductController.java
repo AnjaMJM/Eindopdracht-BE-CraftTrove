@@ -2,15 +2,12 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
-import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
-import com.crafter.crafttroveapi.helpers.validation.UpdateGroup;
+import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -28,9 +25,9 @@ public class ProductController {
         this.productService = productService;
     }
 
-    private void setAuthentication(SecurityContext context) {
-        Authentication authentication = context.getAuthentication();
-    }
+//    private void setAuthentication(SecurityContext context) {
+//        Authentication authentication = context.getAuthentication();
+//    }
 
     @GetMapping
     public ResponseEntity<List<ProductOutputDTO>> getAllProducts(
@@ -52,7 +49,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody @Validated(CreateGroup.class) ProductInputDTO newProduct) {
+    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody ProductInputDTO newProduct) {
         ProductOutputDTO createdProduct = productService.createNewProduct(newProduct);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -62,8 +59,8 @@ public class ProductController {
         return ResponseEntity.created(location).body(createdProduct);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @RequestBody @Validated(UpdateGroup.class) ProductInputDTO updatedProduct){
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @RequestBody ProductPatchInputDTO updatedProduct){
         ProductOutputDTO update = productService.updateProduct(id, updatedProduct);
         return ResponseEntity.ok(update);
     }

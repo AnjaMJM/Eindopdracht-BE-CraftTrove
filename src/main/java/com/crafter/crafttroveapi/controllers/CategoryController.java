@@ -26,7 +26,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<CategoryOutputDTO> getCategoryByName(@PathVariable("name") String name) {
+    public ResponseEntity<CategoryOutputDTO> getCategoryByName(@PathVariable String name) {
         return ResponseEntity.ok(categoryService.getCategoryByName(name));
     }
 

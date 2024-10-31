@@ -1,5 +1,8 @@
 package com.crafter.crafttroveapi.DTOs.designerDTO;
 
+import com.crafter.crafttroveapi.DTOs.fileDTO.FileLogoOutputDTO;
+import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
+import com.crafter.crafttroveapi.models.File;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +16,7 @@ public class DesignerOutputDTO {
 
     private String brandName;
 
-    private String logo;
+    private String logoUrl;
 
     private String brandDescription;
 

@@ -41,14 +41,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/designers").hasAnyAuthority("ROLE_USER")
 
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
-                        .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
-                        .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
-                        .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
+                        .anyRequest().permitAll()
 
-
-
-                        .anyRequest().denyAll()
+//                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+//                        .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
+//                        .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+//                        .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
+//
+//
+//
+//                        .anyRequest().denyAll()
 
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

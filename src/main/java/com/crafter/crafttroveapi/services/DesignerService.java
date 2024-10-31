@@ -5,7 +5,6 @@ import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.mappers.DesignerMapper;
 import com.crafter.crafttroveapi.models.*;
 import com.crafter.crafttroveapi.repositories.DesignerRepository;
@@ -14,7 +13,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,13 @@ public class DesignerService {
     private final DesignerRepository designerRepository;
     private final UserRepository userRepository;
     private final DesignerMapper designerMapper;
+    private final FileService fileService;
 
-    public DesignerService(DesignerRepository designerRepository, UserRepository userRepository, DesignerMapper designerMapper) {
+    public DesignerService(DesignerRepository designerRepository, UserRepository userRepository, DesignerMapper designerMapper, FileService fileService) {
         this.designerRepository = designerRepository;
         this.userRepository = userRepository;
         this.designerMapper = designerMapper;
+        this.fileService = fileService;
     }
 
     public List<DesignerOutputDTO> getAllDesigners() {
@@ -50,28 +53,37 @@ public class DesignerService {
         return designerMapper.designerToOutput(designer);
     }
 
-    public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner ) {
+    public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner, MultipartFile logo) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
+        // User die wil uitbereiden tot designer ophalen en User-entity aanpassen
         Optional<User> optionalUser = userRepository.findByUsername(username);
+        User existingUser = new User();
         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setDesigner(true);
-            Set<Role> roleSet = user.getRoles();
+            existingUser = optionalUser.get();
+            existingUser.setDesigner(true);
+            Set<Role> roleSet = existingUser.getRoles();
             Role designerRole = new Role();
             designerRole.setName("ROLE_DESIGNER");
             roleSet.add(designerRole);
-            user.setRoles(roleSet);
+            existingUser.setRoles(roleSet);
+            newDesigner.setUser(existingUser);
         } else {
             throw new RecordNotFoundException("User not found with username: " + username);
         }
-
         if (designerRepository.existsByBrandNameIgnoreCase(newDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
         }
+        // Nieuwe designer aanmaken en User-info overnemen
 
+
+        if(!logo.isEmpty()) {
+            File savedLogo = fileService.uploadLogo(logo);
+            newDesigner.setLogo(savedLogo);
+        }
         Designer designer = designerRepository.save(designerMapper.inputToDesigner(newDesigner));
+
         return designerMapper.designerToOutput(designer);
     }
 

@@ -1,6 +1,5 @@
 package com.crafter.crafttroveapi.models;
 
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,6 @@
 package com.crafter.crafttroveapi.mappers;
 
 import com.crafter.crafttroveapi.DTOs.roleDTO.RoleDTO;
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.models.Role;
 import org.springframework.stereotype.Service;
 

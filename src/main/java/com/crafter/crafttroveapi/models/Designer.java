@@ -1,19 +1,23 @@
 package com.crafter.crafttroveapi.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.List;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "id")
 @Table(name = "designers")
 @Getter
 @Setter
-public class Designer extends User {
+public class Designer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(mappedBy = "designer")
+    private User user;
 
     @Column(nullable = false, unique = true)
     private String brandName;
@@ -26,4 +30,5 @@ public class Designer extends User {
 
     @OneToMany(mappedBy = "designer", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Product> products;
+
 }

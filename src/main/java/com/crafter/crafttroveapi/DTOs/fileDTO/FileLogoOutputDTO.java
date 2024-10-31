@@ -1,26 +1,21 @@
 package com.crafter.crafttroveapi.DTOs.fileDTO;
 
 import com.crafter.crafttroveapi.models.Designer;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
-public class FileUploadDTO {
+public class FileLogoOutputDTO {
 
-    @NotNull
+    private Long id;
+
     private String name;
-    @NotNull
-    private byte[] fileData;
-    @NotNull
+
     private String url;
 
     private String contentType;
 
-    private long size;
-
     private Designer designer;
-//    private Product product;
 }

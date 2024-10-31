@@ -1,6 +1,5 @@
 package com.crafter.crafttroveapi.models;
 
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +54,10 @@ public class User {
 
     @Column(columnDefinition = "boolean default false")
     private boolean isDesigner;
+
+    @OneToOne
+    @JoinColumn(name = "designer_id", referencedColumnName = "id")
+    private Designer designer;
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

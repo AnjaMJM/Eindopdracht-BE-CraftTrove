@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "files")
 @Getter
 @Setter
 public class File {
@@ -18,18 +19,20 @@ public class File {
     @Lob
     private byte[] fileData;
 
+    private String url;
+
     private String contentType;
 
     private long size;
 
-    @OneToOne(mappedBy = "logo")
+    @OneToOne(mappedBy = "brandLogo")
     private Designer designer; //mapped
 
-    @OneToOne(mappedBy = "thumbnail")
-    private Product thumbnail;
-
-    @OneToOne(mappedBy = "pattern")
-    private Product pattern;
+//    @OneToOne(mappedBy = "thumbnail")
+//    private Product product;
+//
+//    @OneToOne(mappedBy = "patternFile")
+//    private Product pattern;
 
 //    @ManyToOne
 //    private Product photos;

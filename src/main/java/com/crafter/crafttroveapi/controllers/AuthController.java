@@ -3,7 +3,6 @@ package com.crafter.crafttroveapi.controllers;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserLoginRequestDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
-import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import com.crafter.crafttroveapi.security.JwtService;
 import com.crafter.crafttroveapi.services.UserService;
@@ -34,7 +33,7 @@ public class AuthController {
         this.userService = userService;
     }
     @PostMapping("/signup")
-    public ResponseEntity<UserOutputDTO> createNewUser(@RequestBody @Validated(CreateGroup.class) UserInputDTO newUser) {
+    public ResponseEntity<UserOutputDTO> createNewUser(@RequestBody UserInputDTO newUser) {
         UserOutputDTO createdUser = userService.createNewUser(newUser);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

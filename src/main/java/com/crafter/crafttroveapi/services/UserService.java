@@ -4,7 +4,6 @@ import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.mappers.UserMapper;
 import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;

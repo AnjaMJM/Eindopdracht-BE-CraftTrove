@@ -20,38 +20,35 @@ VALUES (1, 'Sewing',
        (10, 'Weaving',
         'The process of interlacing threads or yarns on a loom to create fabric. Weaving is used for making garments, rugs, and textiles.');
 
+INSERT INTO designers (id, brand_name, brand_description)
+VALUES (1001, 'Walkers Knits', 'A creative knitwear designer specializing in modern and classic patterns.'),
+       (1002, 'Bobs Stitchworks', 'Specializes in functional, everyday clothing designs with a touch of creativity.'),
+       (1003, 'Smith Creations', 'Creating bold, unique crochet patterns and designs for enthusiasts.'),
+       (1004, 'Browns Weaving', 'Expert in woven designs and intricate patterns for traditional and modern styles.'),
+       (1006, 'Dream Design', 'Creating fun and easy designs, for everybody to follow along. From starting creatives, to pro-crafters looking for a quick project');
+
 -- Users Table
-INSERT INTO users (id, username, password, email, is_designer)
+INSERT INTO users (id, username, password, email, is_designer, designer_id)
 VALUES (1001, 'alicewalker', '$2a$12$MU.EA3cAWvRVhX/ujco2OOtbp.4RwuhncKRBJqsJm1JbljnDc11dO', 'alice@walkersknits.com',
-        true),
+        true, 1001),
        (1002, 'bobjohnson', ' $2a$12$hwEYuVCgFJruonINEkKOj.F1Y8rXgIT5DJdSdcSfjp9NCEGJqd4sy ', 'bob@stitchworks.com',
-        true),
+        true, 1002),
        (1003, 'carolsmith', ' $2a$12$78KAIeHXf2MnbRN65Tk6MOHFPDnMnUQibvRsu9uxLWw20cY7UObPW ',
-        'carol@smithcreations.com', true),
+        'carol@smithcreations.com', true, 1003),
        (1004, 'davidbrown', ' $2a$12$ZzW29rNM86p6TnIrXAEoiefD/8YVauZCkK0H7kCbnSIPhwj/IEPpe ', 'david@brownsweaving.com',
-        true),
+        true, 1004),
        (1005, 'crafty user', '$2a$12$GL97deK465zp4.N2lDis7.XI86h/RLVqVHb9VpgXtCA2NBxhyTd7G', 'user@crafttrove.com',
-        false),                           --ww: wachtwoord
+        false, null),                           --ww: wachtwoord
        (1006, 'dreamy designer', '$2a$12$x/mwrBmtw1trzIInzsIZY.pKS0hKq/qgVhCBacrPHvA85cWpLGAMq',
-        'designer@crafttrove.com', true), --ww: wachtwoord
+        'designer@crafttrove.com', true, 1006), --ww: wachtwoord
        (1007, 'active admin', '$2a$12$DiwMtidnlOvDbOOPRjn0AuMjhVUdAX/Yw3j07dHLpo2aFgyZOCqkS', 'admin@crafttrove.com',
-        false);
+        false, null);
 --ww: wachtwoord
 
 -- Designers Table
-INSERT INTO designers (id, brand_name, brand_logo, brand_description)
-VALUES (1001, 'Walkers Knits', 'logo1.png',
-        'A creative knitwear designer specializing in modern and classic patterns.'),
-       (1002, 'Bobs Stitchworks', 'logo2.png',
-        'Specializes in functional, everyday clothing designs with a touch of creativity.'),
-       (1003, 'Smith Creations', 'logo3.png', 'Creating bold, unique crochet patterns and designs for enthusiasts.'),
-       (1004, 'Browns Weaving', 'logo4.png',
-        'Expert in woven designs and intricate patterns for traditional and modern styles.'),
-       (1006, 'Dream Design', 'logo5.png',
-        'Creating fun and easy designs, for everybody to follow along. From starting creatives, to pro-crafters looking for a quick project');
 
 -- Products Table
-INSERT INTO products (id, title, description, price, thumbnail, pattern, designer_id, is_available)
+INSERT INTO products (id, title, description, price, thumbnail, pattern_file, designer_id, is_available)
 VALUES (1001, 'Classic Cable Knit Sweater', 'A cozy, classic cable knit sweater pattern perfect for winter wear.',
         49.99, 'thumb1.jpg', 'Cable_Knit.pdf', 1001, false),
        (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag with modern aesthetics.', 29.99,
