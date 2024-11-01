@@ -3,6 +3,7 @@ package com.crafter.crafttroveapi.controllers;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserLoginRequestDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
+import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import com.crafter.crafttroveapi.security.JwtService;
 import com.crafter.crafttroveapi.services.UserService;
@@ -43,8 +44,7 @@ public class AuthController {
         return ResponseEntity.created(location).body(createdUser);
     }
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO
-    ) {
+    public ResponseEntity<Object> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO) {
         UsernamePasswordAuthenticationToken up =
                 new UsernamePasswordAuthenticationToken(userLoginRequestDTO.getUsername(), userLoginRequestDTO.getPassword());
 
@@ -57,7 +57,7 @@ public class AuthController {
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .body("Login successful, Token generated");
         } catch (AuthenticationException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+            throw new FailToAuthenticateException("Username and password do not match");
         }
 
     }

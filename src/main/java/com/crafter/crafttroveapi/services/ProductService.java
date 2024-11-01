@@ -7,11 +7,12 @@ import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
-import com.crafter.crafttroveapi.helpers.JsonNullableUtils;
+import com.crafter.crafttroveapi.helpers.PatchHelper;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
 import com.crafter.crafttroveapi.models.*;
 import com.crafter.crafttroveapi.repositories.*;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,17 +31,14 @@ public class ProductService {
     private final KeywordRepository keywordRepository;
     private final ProductMapper productMapper;
     private final UserRepository userRepository;
-    private final DesignerRepository designerRepository;
-
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository, DesignerRepository designerRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
         this.productMapper = productMapper;
         this.userRepository = userRepository;
-        this.designerRepository = designerRepository;
     }
 
     public List<ProductOutputDTO> getAllProducts() {
@@ -77,7 +75,7 @@ public class ProductService {
         return productMapper.ListProductToOutput(keyword.getProducts());
     }
 
-
+    @Transactional
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -94,7 +92,6 @@ public class ProductService {
         } else {
             throw new RecordNotFoundException("User not found");
         }
-
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
@@ -102,8 +99,7 @@ public class ProductService {
         return productMapper.productToOutput(p);
     }
 
-
-    //    // Change to patch! Extra PatchInputDTO zonder constraints
+    @Transactional
     public ProductOutputDTO updateProduct(Long id, ProductPatchInputDTO updatedProduct) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -122,49 +118,43 @@ public class ProductService {
         if (product.isEmpty()) {
             throw new RecordNotFoundException("This product does not exist in your shop");
         }
-// https://github.com/hkakutalua/spring-patch-updates/blob/master/src/main/java/com/example/partialupdates/controllers/PeopleController.java
+
+        if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
+            throw new DuplicateRecordException("A product with this name already exists");
+        }
+
         Product existingProduct = product.get();
-        JsonNullableUtils.changeIfPresent(ProductPatchInputDTO.getTitle(), existingProduct::setTitle);
+        BeanUtils.copyProperties(updatedProduct, existingProduct, PatchHelper.getNullPropertyNames(updatedProduct));
 
-                    if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
-                        throw new DuplicateRecordException("A product with this name already exists");
-                    } else {
-                        existingProduct.setTitle(updatedProduct.getTitle());}
+        Product savedProduct = productRepository.save(existingProduct);
 
-
-        Product savedProduct=productRepository.save(productMapper.patchToProduct(updatedProduct));
         return productMapper.productToOutput(savedProduct);
+    }
 
+    @Transactional
+    @CheckAvailability
+    public void deleteProduct(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (user.isDesigner()) {
+                Designer designer = user.getDesigner();
+
+                Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+                if (product.isPresent()) {
+                    Product existingProduct = product.get();
+
+                    existingProduct.setIsAvailable(false);
+                } else {
+                    throw new RecordNotFoundException("This product does not exist in your shop");
+                }
+            } else {
+                throw new RecordNotFoundException("There is no designer or admin account for user " + username);
+            }
+        } else {
+            throw new RecordNotFoundException("User not found");
         }
-
-
-@Transactional
-@CheckAvailability
-public void deleteProduct(Long id){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String username=authentication.getName();
-        Optional<User> optionalUser=userRepository.findByUsername(username);
-        if(optionalUser.isPresent()){
-        User user=optionalUser.get();
-        if(user.isDesigner()){
-        Designer designer=user.getDesigner();
-
-        Optional<Product> product=productRepository.findByIdAndDesigner(id,designer);
-        if(product.isPresent()){
-        Product existingProduct=product.get();
-
-        existingProduct.setIsAvailable(false);
-
-        }else{
-        throw new RecordNotFoundException("This product does not exist in your shop");
-        }
-        }else{
-        throw new RecordNotFoundException("There is no designer account for user "+username);
-        }
-        }else{
-        throw new RecordNotFoundException("User not found");
-        }
-
-
-        }
-        }
+    }
+}

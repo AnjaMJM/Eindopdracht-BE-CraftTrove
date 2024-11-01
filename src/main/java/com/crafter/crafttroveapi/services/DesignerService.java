@@ -68,21 +68,23 @@ public class DesignerService {
             designerRole.setName("ROLE_DESIGNER");
             roleSet.add(designerRole);
             existingUser.setRoles(roleSet);
+            userRepository.save(existingUser);
             newDesigner.setUser(existingUser);
         } else {
             throw new RecordNotFoundException("User not found with username: " + username);
         }
+
         if (designerRepository.existsByBrandNameIgnoreCase(newDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
         }
-        // Nieuwe designer aanmaken en User-info overnemen
-
 
         if(!logo.isEmpty()) {
             File savedLogo = fileService.uploadLogo(logo);
             newDesigner.setLogo(savedLogo);
         }
+
         Designer designer = designerRepository.save(designerMapper.inputToDesigner(newDesigner));
+
 
         return designerMapper.designerToOutput(designer);
     }

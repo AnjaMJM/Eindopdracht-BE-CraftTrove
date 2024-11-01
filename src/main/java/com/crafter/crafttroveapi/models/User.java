@@ -55,8 +55,7 @@ public class User {
     @Column(columnDefinition = "boolean default false")
     private boolean isDesigner;
 
-    @OneToOne
-    @JoinColumn(name = "designer_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "user")
     private Designer designer;
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

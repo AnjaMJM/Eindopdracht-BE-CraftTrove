@@ -36,7 +36,6 @@ class CategoryServiceTest {
     @Mock
     private CategoryRepository repository;
 
-
     @Mock
     public CategoryMapper categoryMapper;
 

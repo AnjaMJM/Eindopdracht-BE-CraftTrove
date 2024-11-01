@@ -4,6 +4,7 @@ import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,9 +26,9 @@ public class ProductController {
         this.productService = productService;
     }
 
-//    private void setAuthentication(SecurityContext context) {
-//        Authentication authentication = context.getAuthentication();
-//    }
+    private void setAuthentication(SecurityContext context) {
+        Authentication authentication = context.getAuthentication();
+    }
 
     @GetMapping
     public ResponseEntity<List<ProductOutputDTO>> getAllProducts(
@@ -49,7 +50,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody ProductInputDTO newProduct) {
+    public ResponseEntity<ProductOutputDTO> createNewProduct(@Valid @RequestBody ProductInputDTO newProduct) {
         ProductOutputDTO createdProduct = productService.createNewProduct(newProduct);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -60,7 +61,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @RequestBody ProductPatchInputDTO updatedProduct){
+    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductPatchInputDTO updatedProduct){
         ProductOutputDTO update = productService.updateProduct(id, updatedProduct);
         return ResponseEntity.ok(update);
     }
