@@ -40,15 +40,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/purchase").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/designers").hasAnyAuthority("ROLE_USER")
+//                        .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
+                        .anyRequest().permitAll()
 
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
-                        .requestMatchers("/products").hasAuthority("ROLE_DESIGNER")
-                        .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
-                        .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
-
-
-
-                        .anyRequest().denyAll()
+//                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+//
+//                        .requestMatchers(HttpMethod.DELETE, "/designers").hasAnyAuthority("ROLE_DESIGNER", "ROLE_ADMIN")
+//                        .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
+//
+//
+//
+//                        .anyRequest().denyAll()
 
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

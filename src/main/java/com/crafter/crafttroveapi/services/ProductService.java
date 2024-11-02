@@ -2,16 +2,21 @@ package com.crafter.crafttroveapi.services;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
+import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
+import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
+import com.crafter.crafttroveapi.helpers.PatchHelper;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
 import com.crafter.crafttroveapi.models.*;
 import com.crafter.crafttroveapi.repositories.*;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -28,17 +33,14 @@ public class ProductService {
     private final KeywordRepository keywordRepository;
     private final ProductMapper productMapper;
     private final UserRepository userRepository;
-    private final DesignerRepository designerRepository;
-
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository, DesignerRepository designerRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
         this.productMapper = productMapper;
         this.userRepository = userRepository;
-        this.designerRepository = designerRepository;
     }
 
     public List<ProductOutputDTO> getAllProducts() {
@@ -75,19 +77,23 @@ public class ProductService {
         return productMapper.ListProductToOutput(keyword.getProducts());
     }
 
-
+    @Transactional
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
-        if (optionalDesigner.isPresent()) {
-            Designer designer = optionalDesigner.get();
-            newProduct.setDesigner(designer);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (user.isDesigner()) {
+                Designer designer = user.getDesigner();
+                newProduct.setDesigner(designer);
+            } else {
+                throw new RecordNotFoundException("There is no designer account for user " + username);
+            }
         } else {
-            throw new RecordNotFoundException("There is no designer account for user " + username);
+            throw new RecordNotFoundException("User not found");
         }
-
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
@@ -95,91 +101,76 @@ public class ProductService {
         return productMapper.productToOutput(p);
     }
 
-
-    public ProductOutputDTO updateProduct(Long id, ProductInputDTO updatedProduct) {
+    @Transactional
+    public ProductOutputDTO updateProduct(Long id, ProductPatchInputDTO updatedProduct) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
-        if (optionalDesigner.isPresent()) {
-            Designer designer = optionalDesigner.get();
-            Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
-            if (product.isPresent()) {
-                Product existingProduct = product.get();
 
-                if (updatedProduct.getTitle() != null) {
-
-                    if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
-                        throw new DuplicateRecordException("A product with this name already exists");
-                    } else {
-                        existingProduct.setTitle(updatedProduct.getTitle());
-                    }
-
-                }
-                if (updatedProduct.getDescription() != null) {
-                    existingProduct.setDescription(updatedProduct.getDescription());
-                }
-                if (updatedProduct.getPrice() != null) {
-                    existingProduct.setPrice(updatedProduct.getPrice());
-                }
-                if (updatedProduct.getThumbnail() != null) {
-                    existingProduct.setThumbnail(updatedProduct.getThumbnail());
-                }
-                if (updatedProduct.getPhotos() != null) {
-                    existingProduct.setPhotos(updatedProduct.getPhotos());
-                }
-                if (updatedProduct.getPattern() != null) {
-                    existingProduct.setPattern(updatedProduct.getPattern());
-                }
-                if (updatedProduct.getCategoryList() != null) {
-                    List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedProduct.getCategoryList());
-                    existingProduct.setCategories(categories);
-                }
-                if (updatedProduct.getKeywordList() != null) {
-                    List<Keyword> keywords = new ArrayList<>();
-                    for (String keywordName : updatedProduct.getKeywordList()) {
-                        Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
-                                .orElseGet(() -> {
-                                    Keyword newKeyword = new Keyword();
-                                    newKeyword.setName(keywordName);
-                                    return keywordRepository.save(newKeyword);
-                                });
-                        keywords.add(keyword);
-                    }
-                    existingProduct.setKeywords(keywords);
-                }
-                if (updatedProduct.getIsAvailable() != null) {
-                    existingProduct.setIsAvailable(updatedProduct.getIsAvailable());
-                }
-                Product savedProduct = productRepository.save(existingProduct);
-                return productMapper.productToOutput(savedProduct);
-
-            } else {
-                throw new RecordNotFoundException("This product does not exist in your shop");
-            }
-        } else {
-            throw new RecordNotFoundException("Designer not found");
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            throw new RecordNotFoundException("User not found");
         }
-    }
+        User user = optionalUser.get();
+        if (!user.isDesigner()) {
+            throw new RecordNotFoundException("There is no designer account for user " + username);
+        }
 
+        Designer designer = user.getDesigner();
+        Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+        if (product.isEmpty()) {
+            throw new RecordNotFoundException("This product does not exist in your shop");
+        }
+
+        if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
+            throw new DuplicateRecordException("A product with this name already exists");
+        }
+
+        Product existingProduct = product.get();
+        BeanUtils.copyProperties(updatedProduct, existingProduct, PatchHelper.getNullPropertyNames(updatedProduct));
+
+        Product savedProduct = productRepository.save(existingProduct);
+
+        return productMapper.productToOutput(savedProduct);
+    }
 
     @Transactional
     @CheckAvailability
-    public void deleteProduct(Long id) {
+    public void deleteProductByDesigner(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Optional<Designer> optionalDesigner = designerRepository.findByUsername(username);
-        if (optionalDesigner.isPresent()) {
-            Designer designer = optionalDesigner.get();
-            Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
-            if (product.isPresent()) {
-                Product existingProduct = product.get();
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            throw new RecordNotFoundException("User not found");
+        }
+        User user = optionalUser.get();
 
-                existingProduct.setIsAvailable(false);
+        if (!user.isDesigner()) {
+            throw new RecordNotFoundException("There is no designer account for user " + username);
+        }
+        Designer designer = user.getDesigner();
 
-            } else {
-                throw new RecordNotFoundException("This product does not exist in your shop");
-            }
+        Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+        if (product.isEmpty()) {
+            throw new RecordNotFoundException("This product does not exist in your shop or is already set to unavailable");
+        }
+        Product existingProduct = product.get();
+        existingProduct.setIsAvailable(false);
+    }
+
+    @Transactional
+    @CheckAvailability
+    public void deleteProductByAdmin(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (!isAdmin) {
+            throw new FailToAuthenticateException("Authentication for this action failed");
         }
 
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isEmpty()) {
+            throw new RecordNotFoundException("This product does not exist or is already set to unavailable");
+        }
+        Product existingProduct = product.get();
+        existingProduct.setIsAvailable(false);
     }
 }

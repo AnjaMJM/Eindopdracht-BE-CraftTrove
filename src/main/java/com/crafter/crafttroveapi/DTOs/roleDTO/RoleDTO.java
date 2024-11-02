@@ -1,6 +1,5 @@
 package com.crafter.crafttroveapi.DTOs.roleDTO;
 
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import lombok.Getter;
 import lombok.Setter;
 

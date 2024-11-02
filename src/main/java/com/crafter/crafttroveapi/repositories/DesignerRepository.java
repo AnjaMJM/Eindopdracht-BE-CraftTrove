@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface DesignerRepository extends JpaRepository<Designer, Long> {
-    Optional<Designer> findByUsername(String username);
+    Optional<Designer> findByBrandName(String brandName);
     boolean existsByBrandNameIgnoreCase(String name);
     Optional<Designer> findDesignerByBrandNameIgnoreCase(String name);
 }

@@ -2,18 +2,17 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
-import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
-import com.crafter.crafttroveapi.helpers.validation.UpdateGroup;
+import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.management.DescriptorKey;
 import java.net.URI;
 import java.util.List;
 
@@ -51,8 +50,8 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<ProductOutputDTO> createNewProduct(@RequestBody @Validated(CreateGroup.class) ProductInputDTO newProduct) {
+    @PostMapping("/designer")
+    public ResponseEntity<ProductOutputDTO> createNewProduct(@Valid @RequestBody ProductInputDTO newProduct) {
         ProductOutputDTO createdProduct = productService.createNewProduct(newProduct);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -62,15 +61,21 @@ public class ProductController {
         return ResponseEntity.created(location).body(createdProduct);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @RequestBody @Validated(UpdateGroup.class) ProductInputDTO updatedProduct){
+    @PatchMapping("/designer/{id}")
+    public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductPatchInputDTO updatedProduct){
         ProductOutputDTO update = productService.updateProduct(id, updatedProduct);
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+    @DeleteMapping("/designer/{id}")
+    public ResponseEntity<String> deleteProductByDesigner(@PathVariable Long id) {
+        productService.deleteProductByDesigner(id);
+        return ResponseEntity.ok("Product successfully deleted");
+    }
+
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<String> deleteProductByAdmin(@PathVariable Long id) {
+        productService.deleteProductByAdmin(id);
         return ResponseEntity.ok("Product successfully deleted");
     }
 }

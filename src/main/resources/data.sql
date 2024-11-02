@@ -1,24 +1,25 @@
 INSERT INTO categories (id, name, description)
-VALUES (1, 'Sewing',
+VALUES (1001, 'Sewing',
         'The craft of fastening or attaching objects using stitches made with a needle and thread. Sewing is used in the making of garments, accessories, and home decor items.'),
-       (2, 'Knitting',
+       (1002, 'Knitting',
         'A method of creating fabric by interlocking loops of yarn with needles. Knitting can be used to make garments, blankets, and a wide variety of other items.'),
-       (3, 'Crochet',
+       (1003, 'Crochet',
         'A handicraft in which yarn is made up into a textured fabric by means of a hooked needle. Crochet can be used to create blankets, garments, and decorative items.'),
-       (4, 'Embroidery',
+       (1004, 'Embroidery',
         'The art of decorating fabric with needle and thread or yarn to create intricate designs, often including embellishments like beads, sequins, and pearls.'),
-       (5, 'Lace',
+       (1005, 'Lace',
         'A delicate fabric made of yarn or thread in an open weblike pattern, often used as decorative trims for clothing, home textiles, or crafts.'),
-       (6, 'Quilt',
+       (1006, 'Quilt',
         'A sewing method used to join two or more layers of fabric, typically filled with padding, to create a thicker material, commonly used for making blankets and home decor items.'),
-       (7, 'Macrame',
+       (1007, 'Macrame',
         'The craft of knotting cord or string in patterns to create decorative pieces such as wall hangings, plant holders, and jewelry.'),
-       (8, 'Mending',
+       (1008, 'Mending',
         'The process of repairing holes or worn areas in fabric, often involving patching or stitching to extend the lifespan of a garment or textile.'),
-       (9, 'Felt',
+       (1009, 'Felt',
         'A technique for creating fabric from wool or other fibers using heat, moisture, and pressure. Felt is used for making accessories, home decor, and craft items.'),
-       (10, 'Weaving',
+       (1010, 'Weaving',
         'The process of interlacing threads or yarns on a loom to create fabric. Weaving is used for making garments, rugs, and textiles.');
+
 
 -- Users Table
 INSERT INTO users (id, username, password, email, is_designer)
@@ -39,28 +40,24 @@ VALUES (1001, 'alicewalker', '$2a$12$MU.EA3cAWvRVhX/ujco2OOtbp.4RwuhncKRBJqsJm1J
 --ww: wachtwoord
 
 -- Designers Table
-INSERT INTO designers (id, brand_name, brand_logo, brand_description)
-VALUES (1001, 'Walkers Knits', 'logo1.png',
-        'A creative knitwear designer specializing in modern and classic patterns.'),
-       (1002, 'Bobs Stitchworks', 'logo2.png',
-        'Specializes in functional, everyday clothing designs with a touch of creativity.'),
-       (1003, 'Smith Creations', 'logo3.png', 'Creating bold, unique crochet patterns and designs for enthusiasts.'),
-       (1004, 'Browns Weaving', 'logo4.png',
-        'Expert in woven designs and intricate patterns for traditional and modern styles.'),
-       (1006, 'Dream Design', 'logo5.png',
-        'Creating fun and easy designs, for everybody to follow along. From starting creatives, to pro-crafters looking for a quick project');
+INSERT INTO designers (id, brand_name, brand_description, user_id)
+VALUES (1001, 'Walkers Knits', 'A creative knitwear designer specializing in modern and classic patterns.', 1001),
+       (1002, 'Bobs Stitchworks', 'Specializes in functional, everyday clothing designs with a touch of creativity.', 1002),
+       (1003, 'Smith Creations', 'Creating bold, unique crochet patterns and designs for enthusiasts.', 1003),
+       (1004, 'Browns Weaving', 'Expert in woven designs and intricate patterns for traditional and modern styles.', 1004),
+       (1006, 'Dream Design', 'Creating fun and easy designs, for everybody to follow along. From starting creatives, to pro-crafters looking for a quick project', 1006);
 
 -- Products Table
-INSERT INTO products (id, title, description, price, thumbnail, pattern, designer_id, is_available)
+INSERT INTO products (id, title, description, price, thumbnail, pattern_file, designer_id, is_available)
 VALUES (1001, 'Classic Cable Knit Sweater', 'A cozy, classic cable knit sweater pattern perfect for winter wear.',
-        49.99, 'thumb1.jpg', 'Cable_Knit.pdf', 1001, false),
-       (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag with modern aesthetics.', 29.99,
+        9.99, 'thumb1.jpg', 'Cable_Knit.pdf', 1001, false),
+       (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag pattern with modern aesthetics.', 4.99,
         'thumb2.jpg', 'Crochet.pdf', 1003, true),
-       (1003, 'Modern Weave Wall Hanging', 'A decorative woven wall hanging with a mix of textures and colors.', 79.99,
+       (1003, 'Modern Weave Wall Hanging', 'A decorative woven wall hanging with a mix of textures and colors.', 8.50,
         'thumb3.jpg', 'Weaving.pdf', 1004, true),
        (1004, 'Stitchwork Scarf', 'A warm, stitchwork scarf designed for comfort and style.', 19.99, 'thumb4.jpg',
         'Knitting.pdf', 1002, false),
-       (1005, 'Summer Lace Shawl', 'A light lace shawl pattern perfect for warm evenings and special occasions.', 34.99,
+       (1005, 'Summer Lace Shawl', 'A light lace shawl pattern perfect for warm evenings and special occasions.', 14.99,
         'thumb5.jpg', 'Lace.pdf', 1001, true),
        (1006, 'Goofy bunny', 'Fun little needle felted bunny', 5.99, 'thumb6.jpg', 'bunny.pdf', 1006, true);
 
@@ -74,9 +71,10 @@ VALUES (1001, 'sweater'),
 
 -- Purchases Table (Placeholder data, adapt as needed)
 INSERT INTO purchases (id, user_id, date, total_price, is_payed)
-VALUES (1001, 1001, '2023-01-01', 79.98, true),
-       (1002, 1002, '2023-02-15', 34.99, false),
-       (1003, 1003, '2023-03-05', 19.99, true);
+VALUES (1001, 1001, '2023-01-01', 9.99, true),
+       (1002, 1002, '2023-02-15', 4.99, false),
+       (1003, 1003, '2023-03-05', 8.50, true),
+       (1004, 1005, '2024-10-25', 24.98, true);
 
 -- Reviews Table (Placeholder data, adapt as needed)
 INSERT INTO reviews (id, user_id, product_id, text, rating, date)
@@ -91,10 +89,10 @@ VALUES (1001, 'ROLE_USER', true),
 
 -- User Preferences (Categories)
 INSERT INTO user_categories (user_id, category_id)
-VALUES (1001, 1),
-       (1001, 2),
-       (1002, 3),
-       (1003, 4);
+VALUES (1001, 1001),
+       (1001, 1002),
+       (1002, 1003),
+       (1003, 1004);
 
 -- User Wishlist Table (Placeholder data, adapt as needed)
 INSERT INTO user_wishlist (user_id, product_id)
@@ -123,16 +121,16 @@ VALUES (1001, 1001),
 
 -- Products Categories Table
 INSERT INTO products_categories (product_id, category_id)
-VALUES (1001, 2),
-       (1001, 1),
-       (1002, 3),
-       (1002, 1),
-       (1003, 10),
-       (1004, 2),
-       (1004, 1),
-       (1005, 5),
-       (1005, 2),
-       (1006, 9);
+VALUES (1001, 1002),
+       (1001, 1001),
+       (1002, 1003),
+       (1002, 1001),
+       (1003, 1010),
+       (1004, 1002),
+       (1004, 1001),
+       (1005, 1005),
+       (1005, 1002),
+       (1006, 1009);
 
 -- Products Keywords Table
 INSERT INTO products_keywords (product_id, keyword_id)
@@ -147,4 +145,6 @@ VALUES (1001, 1001),
 INSERT INTO products_purchased (product_id, purchase_id)
 VALUES (1001, 1001),
        (1002, 1002),
-       (1003, 1003);
+       (1003, 1003),
+       (1001, 1004),
+       (1005, 1004);

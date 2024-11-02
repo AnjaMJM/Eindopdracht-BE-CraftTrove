@@ -2,9 +2,8 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
-import com.crafter.crafttroveapi.helpers.validation.CreateGroup;
-import com.crafter.crafttroveapi.helpers.validation.UpdateGroup;
 import com.crafter.crafttroveapi.services.DesignerService;
+import com.crafter.crafttroveapi.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,25 +11,29 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/designers")
 public class DesignerController {
 
     private final DesignerService designerService;
-    private Authentication authentication;
+    private final FileService fileService;
 
     @Autowired
-    public DesignerController(DesignerService designerService) {
+    public DesignerController(DesignerService designerService, FileService fileService) {
         this.designerService = designerService;
+        this.fileService = fileService;
     }
 
     private void setAuthentication(SecurityContext context) {
-        this.authentication =context.getAuthentication();
+        Authentication authentication = context.getAuthentication();
     }
 
     @GetMapping()
@@ -44,19 +47,22 @@ public class DesignerController {
     }
 
     @PostMapping()
-    public ResponseEntity<DesignerOutputDTO> createNewDesigner(@RequestBody @Validated(CreateGroup.class) DesignerInputDTO newDesigner) {
+    public ResponseEntity<DesignerOutputDTO> createNewDesigner(@RequestPart("designer") DesignerInputDTO newDesigner, @RequestPart("logo") MultipartFile logo) throws IOException {
         setAuthentication(SecurityContextHolder.getContext());
-        DesignerOutputDTO createdDesigner = designerService.createNewDesigner(newDesigner);
+
+        DesignerOutputDTO createdDesigner = designerService.createNewDesigner(newDesigner, logo);
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{name}")
                 .buildAndExpand(createdDesigner.getBrandName())
                 .toUri();
+
         return ResponseEntity.created(location).body(createdDesigner);
     }
 
     @PutMapping("/{name}")
-    public ResponseEntity<DesignerOutputDTO> updateDesigner(@PathVariable String name, @RequestBody @Validated(UpdateGroup.class) DesignerInputDTO updatedDesigner){
+    public ResponseEntity<DesignerOutputDTO> updateDesigner(@PathVariable String name, @RequestBody DesignerInputDTO updatedDesigner){
         setAuthentication(SecurityContextHolder.getContext());
         DesignerOutputDTO update = designerService.updateDesigner(name, updatedDesigner);
         return ResponseEntity.ok(update);

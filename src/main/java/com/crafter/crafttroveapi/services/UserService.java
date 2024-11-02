@@ -4,7 +4,6 @@ import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
-import com.crafter.crafttroveapi.helpers.RoleEnum;
 import com.crafter.crafttroveapi.mappers.UserMapper;
 import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
@@ -27,12 +26,10 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-
     @Autowired
     public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-
     }
 
     public List<UserOutputDTO> getAllUsers() {
@@ -52,8 +49,8 @@ public class UserService implements UserDetailsService {
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         UserOutputDTO user = new UserOutputDTO();
-        if(Objects.equals(username, authUsername) || isAdmin) {
-            if(optionalUser.isPresent()){
+        if (Objects.equals(username, authUsername) || isAdmin) {
+            if (optionalUser.isPresent()) {
                 User existingUser = optionalUser.get();
                 user = userMapper.userToOutput(existingUser);
             }
@@ -87,25 +84,15 @@ public class UserService implements UserDetailsService {
         return userMapper.userToOutput(createdUser);
     }
 
+    private Optional<User> getOptionalUserModel(Optional<User> user) {
+        return user;
+    }
 
-//    public User updatePassword(UserInputDTO inputDTO) {
-//        Optional<User> user = userRepository.findByUsername(inputDTO.getUsername());
-//        if (user.isEmpty()) {
-//            throw new RecordNotFoundException("User not found");
-//        }
-//        // convert to entity to get the encode password
-//        var update_user = userMapper.inputToUser(inputDTO);
-//        var entity = user.get();
-//        entity.setPassword(update_user.getPassword());
-//        return userRepository.save(entity);
-//    }
-private Optional<User> getOptionalUserModel(Optional<User> user) {
-    return user;
-}
     public Optional<User> getUserByUserName(String username) {
         var user = userRepository.findByUsername(username);
         return getOptionalUserModel(user);
     }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = getUserByUserName(username);
