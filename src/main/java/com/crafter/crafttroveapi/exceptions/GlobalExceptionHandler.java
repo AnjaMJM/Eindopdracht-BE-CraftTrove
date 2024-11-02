@@ -39,11 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorObject> handleDuplicateRecordException(DuplicateRecordException exception) {
         ErrorObject errorObject = new ErrorObject();
 
-        errorObject.setStatusCode(HttpStatus.CONFLICT.value());
+        errorObject.setStatusCode(HttpStatus.FORBIDDEN.value());
         errorObject.setMessage(exception.getMessage());
         errorObject.setTimestamp(new Date());
 
-        return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorObject, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -73,5 +73,16 @@ public class GlobalExceptionHandler {
         errorObject.setTimestamp(new Date());
 
         return new ResponseEntity<>(errorObject, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = ConflictWithResourceStateException.class)
+    public ResponseEntity<ErrorObject> handleConflictWithResource(ConflictWithResourceStateException exception) {
+        ErrorObject errorObject = new ErrorObject();
+
+        errorObject.setStatusCode(HttpStatus.CONFLICT.value());
+        errorObject.setMessage(exception.getMessage());
+        errorObject.setTimestamp(new Date());
+
+        return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
     }
 }

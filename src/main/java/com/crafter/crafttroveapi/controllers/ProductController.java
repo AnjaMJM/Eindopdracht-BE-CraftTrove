@@ -7,12 +7,9 @@ import com.crafter.crafttroveapi.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.management.DescriptorKey;
 import java.net.URI;
 import java.util.List;
 
@@ -25,10 +22,6 @@ public class ProductController {
     @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
-    }
-
-    private void setAuthentication(SecurityContext context) {
-        Authentication authentication = context.getAuthentication();
     }
 
     @GetMapping

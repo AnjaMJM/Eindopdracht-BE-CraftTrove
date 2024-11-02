@@ -23,7 +23,12 @@ public class UserController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<UserOutputDTO> getUserProfile(@PathVariable String name){
+    public ResponseEntity<UserOutputDTO> getUserProfileByUsername(@PathVariable String name){
         return ResponseEntity.ok(userService.getUserByUsername(name));
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<UserOutputDTO> getUserProfileByIdForAdmin(@PathVariable Long id){
+        return ResponseEntity.ok(userService.getUserByIdForAdmin(id));
     }
 }

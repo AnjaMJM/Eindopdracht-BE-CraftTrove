@@ -4,6 +4,7 @@ import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
+import com.crafter.crafttroveapi.exceptions.ConflictWithResourceStateException;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
@@ -134,7 +135,6 @@ public class ProductService {
     }
 
     @Transactional
-    @CheckAvailability
     public void deleteProductByDesigner(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -154,11 +154,14 @@ public class ProductService {
             throw new RecordNotFoundException("This product does not exist in your shop or is already set to unavailable");
         }
         Product existingProduct = product.get();
+        if(!existingProduct.getIsAvailable()) {
+            throw new ConflictWithResourceStateException("This product is already unavailable");
+        }
+
         existingProduct.setIsAvailable(false);
     }
 
     @Transactional
-    @CheckAvailability
     public void deleteProductByAdmin(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
@@ -168,9 +171,12 @@ public class ProductService {
 
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty()) {
-            throw new RecordNotFoundException("This product does not exist or is already set to unavailable");
+            throw new RecordNotFoundException("This product does not exist");
         }
         Product existingProduct = product.get();
+        if(!existingProduct.getIsAvailable()) {
+            throw new ConflictWithResourceStateException("This product is already unavailable");
+        }
         existingProduct.setIsAvailable(false);
     }
 }
