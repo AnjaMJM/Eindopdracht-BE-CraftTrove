@@ -5,6 +5,7 @@ import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
+import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.helpers.PatchHelper;
@@ -15,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -133,28 +135,42 @@ public class ProductService {
 
     @Transactional
     @CheckAvailability
-    public void deleteProduct(Long id) {
+    public void deleteProductByDesigner(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.isDesigner()) {
-                Designer designer = user.getDesigner();
-
-                Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
-                if (product.isPresent()) {
-                    Product existingProduct = product.get();
-
-                    existingProduct.setIsAvailable(false);
-                } else {
-                    throw new RecordNotFoundException("This product does not exist in your shop");
-                }
-            } else {
-                throw new RecordNotFoundException("There is no designer or admin account for user " + username);
-            }
-        } else {
+        if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User not found");
         }
+        User user = optionalUser.get();
+
+        if (!user.isDesigner()) {
+            throw new RecordNotFoundException("There is no designer account for user " + username);
+        }
+        Designer designer = user.getDesigner();
+
+        Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
+        if (product.isEmpty()) {
+            throw new RecordNotFoundException("This product does not exist in your shop or is already set to unavailable");
+        }
+        Product existingProduct = product.get();
+        existingProduct.setIsAvailable(false);
+    }
+
+    @Transactional
+    @CheckAvailability
+    public void deleteProductByAdmin(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (!isAdmin) {
+            throw new FailToAuthenticateException("Authentication for this action failed");
+        }
+
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isEmpty()) {
+            throw new RecordNotFoundException("This product does not exist or is already set to unavailable");
+        }
+        Product existingProduct = product.get();
+        existingProduct.setIsAvailable(false);
     }
 }

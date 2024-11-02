@@ -17,6 +17,7 @@ public class File {
     private String name;
 
     @Lob
+    @Basic(fetch = FetchType.EAGER)
     private byte[] fileData;
 
     private String url;

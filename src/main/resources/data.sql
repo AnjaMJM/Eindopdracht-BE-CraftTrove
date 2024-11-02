@@ -50,14 +50,14 @@ VALUES (1001, 'Walkers Knits', 'A creative knitwear designer specializing in mod
 -- Products Table
 INSERT INTO products (id, title, description, price, thumbnail, pattern_file, designer_id, is_available)
 VALUES (1001, 'Classic Cable Knit Sweater', 'A cozy, classic cable knit sweater pattern perfect for winter wear.',
-        49.99, 'thumb1.jpg', 'Cable_Knit.pdf', 1001, false),
-       (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag with modern aesthetics.', 29.99,
+        9.99, 'thumb1.jpg', 'Cable_Knit.pdf', 1001, false),
+       (1002, 'Everyday Crochet Tote', 'A durable and functional crochet tote bag pattern with modern aesthetics.', 4.99,
         'thumb2.jpg', 'Crochet.pdf', 1003, true),
-       (1003, 'Modern Weave Wall Hanging', 'A decorative woven wall hanging with a mix of textures and colors.', 79.99,
+       (1003, 'Modern Weave Wall Hanging', 'A decorative woven wall hanging with a mix of textures and colors.', 8.50,
         'thumb3.jpg', 'Weaving.pdf', 1004, true),
        (1004, 'Stitchwork Scarf', 'A warm, stitchwork scarf designed for comfort and style.', 19.99, 'thumb4.jpg',
         'Knitting.pdf', 1002, false),
-       (1005, 'Summer Lace Shawl', 'A light lace shawl pattern perfect for warm evenings and special occasions.', 34.99,
+       (1005, 'Summer Lace Shawl', 'A light lace shawl pattern perfect for warm evenings and special occasions.', 14.99,
         'thumb5.jpg', 'Lace.pdf', 1001, true),
        (1006, 'Goofy bunny', 'Fun little needle felted bunny', 5.99, 'thumb6.jpg', 'bunny.pdf', 1006, true);
 
@@ -71,9 +71,10 @@ VALUES (1001, 'sweater'),
 
 -- Purchases Table (Placeholder data, adapt as needed)
 INSERT INTO purchases (id, user_id, date, total_price, is_payed)
-VALUES (1001, 1001, '2023-01-01', 79.98, true),
-       (1002, 1002, '2023-02-15', 34.99, false),
-       (1003, 1003, '2023-03-05', 19.99, true);
+VALUES (1001, 1001, '2023-01-01', 9.99, true),
+       (1002, 1002, '2023-02-15', 4.99, false),
+       (1003, 1003, '2023-03-05', 8.50, true),
+       (1004, 1005, '2024-10-25', 24.98, true);
 
 -- Reviews Table (Placeholder data, adapt as needed)
 INSERT INTO reviews (id, user_id, product_id, text, rating, date)
@@ -144,4 +145,6 @@ VALUES (1001, 1001),
 INSERT INTO products_purchased (product_id, purchase_id)
 VALUES (1001, 1001),
        (1002, 1002),
-       (1003, 1003);
+       (1003, 1003),
+       (1001, 1004),
+       (1005, 1004);

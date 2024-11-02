@@ -5,6 +5,7 @@ import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.models.File;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -21,4 +22,12 @@ public class DesignerOutputDTO {
     private String brandDescription;
 
     private List<Long> productIdList;
+
+
+    public void setLogoUrl(String uniqueUrl) {
+        this.logoUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/files/logo/")
+                .path(uniqueUrl)
+                .toUriString();
+    }
 }

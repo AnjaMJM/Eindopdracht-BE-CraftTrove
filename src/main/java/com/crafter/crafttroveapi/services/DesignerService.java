@@ -80,6 +80,7 @@ public class DesignerService {
 
         if(!logo.isEmpty()) {
             File savedLogo = fileService.uploadLogo(logo);
+
             newDesigner.setLogo(savedLogo);
         }
 

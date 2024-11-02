@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.management.DescriptorKey;
 import java.net.URI;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PostMapping
+    @PostMapping("/designer")
     public ResponseEntity<ProductOutputDTO> createNewProduct(@Valid @RequestBody ProductInputDTO newProduct) {
         ProductOutputDTO createdProduct = productService.createNewProduct(newProduct);
         URI location = ServletUriComponentsBuilder
@@ -60,15 +61,21 @@ public class ProductController {
         return ResponseEntity.created(location).body(createdProduct);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/designer/{id}")
     public ResponseEntity<ProductOutputDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductPatchInputDTO updatedProduct){
         ProductOutputDTO update = productService.updateProduct(id, updatedProduct);
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+    @DeleteMapping("/designer/{id}")
+    public ResponseEntity<String> deleteProductByDesigner(@PathVariable Long id) {
+        productService.deleteProductByDesigner(id);
+        return ResponseEntity.ok("Product successfully deleted");
+    }
+
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<String> deleteProductByAdmin(@PathVariable Long id) {
+        productService.deleteProductByAdmin(id);
         return ResponseEntity.ok("Product successfully deleted");
     }
 }
