@@ -8,6 +8,7 @@ import com.crafter.crafttroveapi.exceptions.ConflictWithResourceStateException;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
+import com.crafter.crafttroveapi.helpers.AuthenticateDesigner;
 import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.helpers.PatchHelper;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
@@ -34,14 +35,16 @@ public class ProductService {
     private final KeywordRepository keywordRepository;
     private final ProductMapper productMapper;
     private final UserRepository userRepository;
+    private final AuthenticateDesigner authDesigner;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository, AuthenticateDesigner authDesigner) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
         this.productMapper = productMapper;
         this.userRepository = userRepository;
+        this.authDesigner = authDesigner;
     }
 
     public List<ProductOutputDTO> getAllProducts() {
@@ -104,19 +107,7 @@ public class ProductService {
 
     @Transactional
     public ProductOutputDTO updateProduct(Long id, ProductPatchInputDTO updatedProduct) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isEmpty()) {
-            throw new RecordNotFoundException("User not found");
-        }
-        User user = optionalUser.get();
-        if (!user.isDesigner()) {
-            throw new RecordNotFoundException("There is no designer account for user " + username);
-        }
-
-        Designer designer = user.getDesigner();
+        Designer designer = authDesigner.designerAuthentication();
         Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
         if (product.isEmpty()) {
             throw new RecordNotFoundException("This product does not exist in your shop");
@@ -136,18 +127,7 @@ public class ProductService {
 
     @Transactional
     public void deleteProductByDesigner(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isEmpty()) {
-            throw new RecordNotFoundException("User not found");
-        }
-        User user = optionalUser.get();
-
-        if (!user.isDesigner()) {
-            throw new RecordNotFoundException("There is no designer account for user " + username);
-        }
-        Designer designer = user.getDesigner();
+        Designer designer = authDesigner.designerAuthentication();
 
         Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
         if (product.isEmpty()) {

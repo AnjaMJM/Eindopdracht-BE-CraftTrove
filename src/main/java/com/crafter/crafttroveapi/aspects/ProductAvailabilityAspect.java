@@ -1,6 +1,7 @@
 package com.crafter.crafttroveapi.aspects;
 
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
+import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.models.Category;
@@ -34,7 +35,7 @@ public class ProductAvailabilityAspect {
 
         if (product.isPresent()) {
             if (!product.get().getIsAvailable()) {
-                throw new IllegalStateException("This product is not available.");
+                throw new FailToAuthenticateException("This product is not available.");
             }
         } else {
             throw new RecordNotFoundException("Product with id " + productId + " not found.");

@@ -36,7 +36,7 @@ public class ReviewController {
 
     @PostMapping("/products/{id}/review")
     public ResponseEntity<ReviewOutputDTO> createNewReview(@PathVariable Long id, @RequestBody ReviewInputDTO newReview) {
-        ReviewOutputDTO createdReview = reviewService.createReview(newReview, id);
+        ReviewOutputDTO createdReview = reviewService.createReview(id, newReview);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

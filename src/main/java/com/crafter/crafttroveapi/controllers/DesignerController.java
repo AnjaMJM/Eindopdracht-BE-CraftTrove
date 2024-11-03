@@ -69,7 +69,7 @@ public class DesignerController {
     }
 
     @DeleteMapping("/{name}")
-    public ResponseEntity<String> deleteDesigner(@PathVariable String name, @PathVariable Long id) {
+    public ResponseEntity<String> deleteDesigner(@PathVariable String name) {
         setAuthentication(SecurityContextHolder.getContext());
         designerService.deleteDesigner(name);
         return ResponseEntity.ok("Designer successfully deleted");

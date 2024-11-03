@@ -102,7 +102,7 @@ class ReviewServiceTest {
         when(reviewRepository.save(review)).thenReturn(review);
         when(mapper.reviewToOutput(any())).thenReturn(output);
         //act
-        ReviewOutputDTO dto = service.createReview(input, 1L);
+        ReviewOutputDTO dto = service.createReview(1L, input);
         //assert
         assertEquals(review.getText(), dto.getReviewText());
         assertEquals(user.getUsername(), output.getUsername());
@@ -116,7 +116,7 @@ class ReviewServiceTest {
         //act
 
         //assert
-        assertThrows(RecordNotFoundException.class, ()-> service.createReview(input, 1L));
+        assertThrows(RecordNotFoundException.class, ()-> service.createReview(1L, input));
     }
 
     @Test
@@ -129,7 +129,7 @@ class ReviewServiceTest {
         // act
 
         //assert
-        assertThrows(RecordNotFoundException.class, ()-> service.createReview(input, 2L));
+        assertThrows(RecordNotFoundException.class, ()-> service.createReview(2L, input));
     }
 
 }

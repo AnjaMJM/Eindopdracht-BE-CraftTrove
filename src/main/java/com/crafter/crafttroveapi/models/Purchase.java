@@ -28,7 +28,12 @@ public class Purchase {
     @Column(nullable = false)
     private double totalPrice;
 
-    @ManyToMany(mappedBy = "purchases", fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "products_purchased",
+            joinColumns = @JoinColumn(name = "purchase_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
     @Column(nullable = false)
     private List<Product> products;
 

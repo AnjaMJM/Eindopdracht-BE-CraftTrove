@@ -36,7 +36,7 @@ public class Product {
     private String patternFile;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "designer_id")
+    @JoinColumn(name = "designer_id", referencedColumnName = "id")
     private Designer designer;
 
     @Column(nullable = false)
@@ -56,12 +56,7 @@ public class Product {
     )
     private List<Keyword> keywords;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "products_purchased",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "purchase_id")
-    )
+    @ManyToMany(mappedBy = "products", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Purchase> purchases;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)

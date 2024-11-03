@@ -97,24 +97,24 @@ public class ProductMapper {
         return product;
     }
 
-    public Product patchToProduct(ProductPatchInputDTO inputDTO) {
+    public Product patchToProduct(ProductPatchInputDTO patchInputDTO) {
         Product product = new Product();
 
-        product.setTitle(inputDTO.getTitle());
-        product.setDescription(inputDTO.getDescription());
-        product.setPrice(inputDTO.getPrice());
-        product.setIsAvailable(inputDTO.getIsAvailable());
-        product.setThumbnail(inputDTO.getThumbnail());
-        product.setPhotos(inputDTO.getPhotos());
-        product.setPatternFile(inputDTO.getPattern());
-        product.setDesigner(inputDTO.getDesigner());
-        if (inputDTO.getCategoryList() != null) {
-            List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
+        product.setTitle(patchInputDTO.getTitle());
+        product.setDescription(patchInputDTO.getDescription());
+        product.setPrice(patchInputDTO.getPrice());
+        product.setIsAvailable(patchInputDTO.getIsAvailable());
+        product.setThumbnail(patchInputDTO.getThumbnail());
+        product.setPhotos(patchInputDTO.getPhotos());
+        product.setPatternFile(patchInputDTO.getPattern());
+        product.setDesigner(patchInputDTO.getDesigner());
+        if (patchInputDTO.getCategoryList() != null) {
+            List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(patchInputDTO.getCategoryList());
             product.setCategories(categories);
         }
-        if (inputDTO.getKeywordList() != null) {
+        if (patchInputDTO.getKeywordList() != null) {
             List<Keyword> keywords = new ArrayList<>();
-            for (String keywordName : inputDTO.getKeywordList()) {
+            for (String keywordName : patchInputDTO.getKeywordList()) {
                 Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
                         .orElseGet(() -> {
                             Keyword newKeyword = new Keyword();

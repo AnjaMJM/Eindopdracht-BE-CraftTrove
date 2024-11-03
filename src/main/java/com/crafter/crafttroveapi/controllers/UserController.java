@@ -31,4 +31,16 @@ public class UserController {
     public ResponseEntity<UserOutputDTO> getUserProfileByIdForAdmin(@PathVariable Long id){
         return ResponseEntity.ok(userService.getUserByIdForAdmin(id));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUserAccount(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("Account successfully deleted");
+    }
+
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<String> deactivateUserByAdmin(@PathVariable Long id) {
+        userService.deactivateUserByAdmin(id);
+        return ResponseEntity.ok("Account successfully deactivated");
+    }
 }

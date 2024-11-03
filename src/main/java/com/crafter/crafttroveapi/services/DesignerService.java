@@ -4,22 +4,23 @@ import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
 import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
+import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
+import com.crafter.crafttroveapi.helpers.AuthenticateDesigner;
+import com.crafter.crafttroveapi.helpers.PatchHelper;
 import com.crafter.crafttroveapi.mappers.DesignerMapper;
 import com.crafter.crafttroveapi.models.*;
 import com.crafter.crafttroveapi.repositories.DesignerRepository;
 import com.crafter.crafttroveapi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DesignerService {
@@ -28,12 +29,14 @@ public class DesignerService {
     private final UserRepository userRepository;
     private final DesignerMapper designerMapper;
     private final FileService fileService;
+    private final AuthenticateDesigner authDesigner;
 
-    public DesignerService(DesignerRepository designerRepository, UserRepository userRepository, DesignerMapper designerMapper, FileService fileService) {
+    public DesignerService(DesignerRepository designerRepository, UserRepository userRepository, DesignerMapper designerMapper, FileService fileService, AuthenticateDesigner authDesigner) {
         this.designerRepository = designerRepository;
         this.userRepository = userRepository;
         this.designerMapper = designerMapper;
         this.fileService = fileService;
+        this.authDesigner = authDesigner;
     }
 
     public List<DesignerOutputDTO> getAllDesigners() {
@@ -57,9 +60,8 @@ public class DesignerService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        // User die wil uitbereiden tot designer ophalen en User-entity aanpassen
         Optional<User> optionalUser = userRepository.findByUsername(username);
-        User existingUser = new User();
+        User existingUser;
         if (optionalUser.isPresent()) {
             existingUser = optionalUser.get();
             existingUser.setDesigner(true);
@@ -73,48 +75,34 @@ public class DesignerService {
         } else {
             throw new RecordNotFoundException("User not found with username: " + username);
         }
-
         if (designerRepository.existsByBrandNameIgnoreCase(newDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
         }
-
-        if(!logo.isEmpty()) {
+        if (!logo.isEmpty()) {
             File savedLogo = fileService.uploadLogo(logo);
 
             newDesigner.setLogo(savedLogo);
         }
-
         Designer designer = designerRepository.save(designerMapper.inputToDesigner(newDesigner));
-
 
         return designerMapper.designerToOutput(designer);
     }
 
     public DesignerOutputDTO updateDesigner(String name, DesignerInputDTO updatedDesigner) {
+        Designer designer = authDesigner.designerAuthentication();
 
-        Optional<Designer> designer = designerRepository.findDesignerByBrandNameIgnoreCase(name);
-        if (designer.isPresent()) {
-            Designer existingDesigner = designer.get();
-
-            if (updatedDesigner.getBrandName() != null) {
-                if (designerRepository.existsByBrandNameIgnoreCase(updatedDesigner.getBrandName())) {
-                    throw new DuplicateRecordException("This brandname is already in use");
-                } else {
-                    existingDesigner.setBrandName(updatedDesigner.getBrandName());
-                }
-            }
-            if (updatedDesigner.getBrandDescription() != null) {
-                existingDesigner.setBrandDescription(updatedDesigner.getBrandDescription());
-            }
-            if (updatedDesigner.getLogo() != null) {
-                existingDesigner.setBrandLogo(updatedDesigner.getLogo());
-            }
-
-            Designer savedDesigner = designerRepository.save(existingDesigner);
-            return designerMapper.designerToOutput(savedDesigner);
-        } else {
-            throw new RecordNotFoundException("Designer not found");
+        if (!Objects.equals(designer.getBrandName(), name)) {
+            throw new FailToAuthenticateException("Authentication and requested brand do not match");
         }
+        if (designerRepository.existsByBrandNameIgnoreCase(updatedDesigner.getBrandName())) {
+            throw new DuplicateRecordException("This brandname is already in use");
+        }
+
+        BeanUtils.copyProperties(updatedDesigner, designer, PatchHelper.getNullPropertyNames(updatedDesigner));
+
+        Designer savedDesigner = designerRepository.save(designer);
+
+        return designerMapper.designerToOutput(savedDesigner);
     }
 
     @Transactional
@@ -124,12 +112,12 @@ public class DesignerService {
         if (optionalDesigner.isPresent()) {
             Designer designer = optionalDesigner.get();
             List<Product> products = optionalDesigner.get().getProducts();
-            for(Product product:products){
+            for (Product product : products) {
                 product.setIsAvailable(false);
             }
             designerRepository.delete(designer);
         } else {
-            throw new RecordNotFoundException( "Brand " + name + " is not found");
+            throw new RecordNotFoundException("Brand " + name + " is not found");
         }
     }
 }

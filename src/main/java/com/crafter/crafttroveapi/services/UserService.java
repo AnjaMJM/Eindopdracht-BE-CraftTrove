@@ -12,7 +12,6 @@ import com.crafter.crafttroveapi.repositories.UserRepository;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -119,7 +118,21 @@ public class UserService implements UserDetailsService {
 
     }
 
-    //deactivcateUserByAdmin: set isEnabled op false
+    public void deactivateUserByAdmin(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        if(!isAdmin) {
+            throw new FailToAuthenticateException("Authentication for this action failed");
+        }
+
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isEmpty()){
+            throw new RecordNotFoundException("User not found");
+        }
+        User user = optionalUser.get();
+        user.setEnabled(false);
+    }
 
     private Optional<User> getOptionalUserModel(Optional<User> user) {
         return user;
