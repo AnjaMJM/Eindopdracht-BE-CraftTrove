@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Transactional
 public class DesignerService {
 
     private final DesignerRepository designerRepository;
@@ -92,7 +93,7 @@ public class DesignerService {
         Designer designer = authDesigner.designerAuthentication();
 
         if (!Objects.equals(designer.getBrandName(), name)) {
-            throw new FailToAuthenticateException("Authentication and requested brand do not match");
+            throw new FailToAuthenticateException("Authentication and requested brand do not match. Check is case sensitive");
         }
         if (designerRepository.existsByBrandNameIgnoreCase(updatedDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
@@ -105,19 +106,16 @@ public class DesignerService {
         return designerMapper.designerToOutput(savedDesigner);
     }
 
-    @Transactional
-    @CheckAvailability
-    public void deleteDesigner(String name) {
-        Optional<Designer> optionalDesigner = designerRepository.findDesignerByBrandNameIgnoreCase(name);
-        if (optionalDesigner.isPresent()) {
-            Designer designer = optionalDesigner.get();
-            List<Product> products = optionalDesigner.get().getProducts();
-            for (Product product : products) {
-                product.setIsAvailable(false);
-            }
-            designerRepository.delete(designer);
-        } else {
-            throw new RecordNotFoundException("Brand " + name + " is not found");
-        }
-    }
+//    public void deleteDesigner(String name) {
+//        Optional<Designer> optionalDesigner = designerRepository.findDesignerByBrandNameIgnoreCase(name);
+//        if (optionalDesigner.isEmpty()) {
+//            throw new RecordNotFoundException("Brand " + name + " is not found");
+//        }
+//        Designer designer = optionalDesigner.get();
+//        List<Product> products = optionalDesigner.get().getProducts();
+//        for (Product product : products) {
+//            product.setIsAvailable(false);
+//        }
+//        designerRepository.delete(designer);
+//    }
 }

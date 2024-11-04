@@ -7,6 +7,7 @@ import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.repositories.ProductRepository;
 import com.crafter.crafttroveapi.services.ProductService;
 import com.crafter.crafttroveapi.services.ReviewService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

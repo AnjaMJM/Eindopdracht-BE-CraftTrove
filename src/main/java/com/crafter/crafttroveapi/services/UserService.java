@@ -10,6 +10,7 @@ import com.crafter.crafttroveapi.models.Role;
 import com.crafter.crafttroveapi.models.User;
 import com.crafter.crafttroveapi.repositories.UserRepository;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -78,6 +79,7 @@ public class UserService implements UserDetailsService {
         return userMapper.userToOutput(existingUser);
     }
 
+    @Transactional
     public UserOutputDTO createNewUser(UserInputDTO newUser) {
         if (userRepository.existsByUsername(newUser.getUsername())) {
             throw new DuplicateRecordException("This username is already taken");
@@ -102,6 +104,7 @@ public class UserService implements UserDetailsService {
         return userMapper.userToOutput(createdUser);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -112,12 +115,13 @@ public class UserService implements UserDetailsService {
         }
         User withId = optionalWithId.get();
 
-        if(Objects.equals(withId.getUsername(), username)) {
-            userRepository.deleteById(id);
+        if(!Objects.equals(withId.getUsername(), username)) {
+            throw new FailToAuthenticateException("You are not authorized to delete this user");
         }
-
+        userRepository.deleteById(id);
     }
 
+    @Transactional
     public void deactivateUserByAdmin(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
