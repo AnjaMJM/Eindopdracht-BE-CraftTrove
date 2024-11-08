@@ -28,7 +28,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,16 +43,14 @@ class ProductServiceTest {
     @Mock
     CategoryRepository categoryRepository;
     @Mock
-    DesignerRepository designerRepository;
-    @Mock
     KeywordRepository keywordRepository;
+    @Mock
+    UserRepository userRepository;
 
 
     private Authentication authentication;
     private SecurityContext securityContext;
-
     private User user;
-    private Designer designer;
     private Product item1;
     private Product item2;
     private Product item3;
@@ -71,9 +68,9 @@ class ProductServiceTest {
         securityContext = Mockito.mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
 
-        // Aangepast na designer en user 1-op-1 relatie te maken. check of nodig is.
         user = new User();
-        user.setUsername(authentication.getName());
+        user.setUsername("mockUser");
+        user.setDesigner(true);
 
         item1 = new Product();
         item1.setId(1L);
@@ -129,6 +126,7 @@ class ProductServiceTest {
     void shouldGetAllProducts() {
         //Arrange
         when(repository.findAllAvailableProducts()).thenReturn(productList);
+        when(mapper.productToOutput(item1)).thenReturn(outputDto);
         //Act
         List<ProductOutputDTO> outputList = service.getAllProducts();
         //Assert
@@ -161,7 +159,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void shouldNotGetProductByCategory() {
+    void canNotGetProductByCategory() {
         //Arrange
         when(categoryRepository.findByNameIgnoreCase("category")).thenReturn(Optional.empty());
         //Act
@@ -182,7 +180,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void shouldNotGetProductsByKeyword() {
+    void canNotGetProductsByKeyword() {
         //Arrange
         when(keywordRepository.findByNameIgnoreCase("keyword")).thenReturn(Optional.empty());
         //Act
@@ -196,7 +194,7 @@ class ProductServiceTest {
         //Arrange
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("mockUser");
-        when(designerRepository.findByBrandName(anyString())).thenReturn(Optional.of(designer));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(mapper.inputToProduct(inputDto)).thenReturn(item1);
         when(repository.save(item1)).thenReturn(item1);
         when(mapper.productToOutput(item1)).thenReturn(outputDto);
@@ -215,7 +213,7 @@ class ProductServiceTest {
         //Arrange
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("mockUser");
-        when(designerRepository.findByBrandName(anyString())).thenReturn(Optional.of(designer));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(repository.existsByTitleIgnoreCase("fun pattern")).thenThrow(DuplicateRecordException.class);
         //Act
         //Assert

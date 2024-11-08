@@ -23,5 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByIdIn(List<Long> id);
 
     Optional<Product> findByIdAndDesigner(Long id, Designer designer);
+    @Query("SELECT p FROM Product p WHERE p.isAvailable = true")
+    Optional<Product> findByIdAndIsAvailable (Long id);
 
 }

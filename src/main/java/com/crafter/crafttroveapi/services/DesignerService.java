@@ -2,7 +2,6 @@ package com.crafter.crafttroveapi.services;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
-import com.crafter.crafttroveapi.annotations.CheckAvailability;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
@@ -62,30 +61,26 @@ public class DesignerService {
         String username = authentication.getName();
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
-        User existingUser;
-        if (optionalUser.isPresent()) {
-            existingUser = optionalUser.get();
-            existingUser.setDesigner(true);
-            Set<Role> roleSet = existingUser.getRoles();
-            Role designerRole = new Role();
-            designerRole.setName("ROLE_DESIGNER");
-            roleSet.add(designerRole);
-            existingUser.setRoles(roleSet);
-            userRepository.save(existingUser);
-            newDesigner.setUser(existingUser);
-        } else {
+        if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User not found with username: " + username);
         }
+        User existingUser = optionalUser.get();
+        existingUser.setDesigner(true);
+        Set<Role> roleSet = existingUser.getRoles();
+        Role designerRole = new Role();
+        designerRole.setName("ROLE_DESIGNER");
+        roleSet.add(designerRole);
+        existingUser.setRoles(roleSet);
+        userRepository.save(existingUser);
+        newDesigner.setUser(existingUser);
         if (designerRepository.existsByBrandNameIgnoreCase(newDesigner.getBrandName())) {
             throw new DuplicateRecordException("This brandname is already in use");
         }
         if (!logo.isEmpty()) {
             File savedLogo = fileService.uploadLogo(logo);
-
             newDesigner.setLogo(savedLogo);
         }
         Designer designer = designerRepository.save(designerMapper.inputToDesigner(newDesigner));
-
         return designerMapper.designerToOutput(designer);
     }
 
@@ -106,16 +101,16 @@ public class DesignerService {
         return designerMapper.designerToOutput(savedDesigner);
     }
 
-//    public void deleteDesigner(String name) {
-//        Optional<Designer> optionalDesigner = designerRepository.findDesignerByBrandNameIgnoreCase(name);
-//        if (optionalDesigner.isEmpty()) {
-//            throw new RecordNotFoundException("Brand " + name + " is not found");
-//        }
-//        Designer designer = optionalDesigner.get();
-//        List<Product> products = optionalDesigner.get().getProducts();
-//        for (Product product : products) {
-//            product.setIsAvailable(false);
-//        }
-//        designerRepository.delete(designer);
-//    }
+    public void deleteDesigner(String name) {
+        Optional<Designer> optionalDesigner = designerRepository.findDesignerByBrandNameIgnoreCase(name);
+        if (optionalDesigner.isEmpty()) {
+            throw new RecordNotFoundException("Brand " + name + " is not found");
+        }
+        Designer designer = optionalDesigner.get();
+        List<Product> products = optionalDesigner.get().getProducts();
+        for (Product product : products) {
+            product.setIsAvailable(false);
+        }
+        designerRepository.delete(designer);
+    }
 }

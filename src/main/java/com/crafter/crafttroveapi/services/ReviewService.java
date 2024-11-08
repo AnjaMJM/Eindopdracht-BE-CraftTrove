@@ -40,7 +40,6 @@ public class ReviewService {
         this.reviewMapper = reviewMapper;
     }
 
-
     @Transactional
     @CheckAvailability
     public ReviewOutputDTO createReview(Long productId, ReviewInputDTO newReview) {
@@ -49,27 +48,22 @@ public class ReviewService {
         Review review = reviewMapper.inputToReview(newReview);
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
-        User user;
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-            review.setUser(user);
-        } else {
+        if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User not found with username: " + username);
         }
-
+        User user = optionalUser.get();
+        review.setUser(user);
         boolean hasPurchased = purchaseRepository.existsByUserIdAndProductIdAndIsPayedTrue(user.getId(), productId);
         if (!hasPurchased) {
             throw new FailToAuthenticateException("You need to purchase a product, before you can write a review about it");
         }
-        Optional<Product> productOptional = productRepository.findById(productId);
-        if (productOptional.isPresent()) {
-            review.setProduct(productOptional.get());
-        } else {
-            throw new RecordNotFoundException("Product not found with id " + productId);
+        Optional<Product> productOptional = productRepository.findByIdAndIsAvailable(productId);
+        if (productOptional.isEmpty()) {
+            throw new RecordNotFoundException("This product is currently not available");
         }
+        review.setProduct(productOptional.get());
         Date dateOfReview = new Date();
         review.setDate(dateOfReview);
-
         Review savedReview = reviewRepository.save(review);
         return reviewMapper.reviewToOutput(savedReview);
     }

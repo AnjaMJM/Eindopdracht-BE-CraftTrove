@@ -22,11 +22,11 @@ public class ProductControllerIntegrationTest {
     MockMvc mockMvc;
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = {"ROLE_USER", "ROLE_DESIGNER"}, username="dreamy designer", password = "wachtwoord")
     void shouldCreateProduct() throws Exception {
         String requestJson = """
                 {
-                    "title": "Lace doyle",
+                    "title": "Pretty lace doyle",
                     "description": "It's like a mini rug for your plants",
                     "price": 9.99,
                     "isAvailable": true,
@@ -39,7 +39,7 @@ public class ProductControllerIntegrationTest {
                 """;
 
         this.mockMvc
-                .perform(MockMvcRequestBuilders.post("/products")
+                .perform(MockMvcRequestBuilders.post("/products/designer")
                         .contentType(APPLICATION_JSON)
                         .content(requestJson))
                 .andDo(MockMvcResultHandlers.print())

@@ -35,6 +35,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserOutputDTO> getAllUsers() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<User> users = userRepository.findAll();
         List<UserOutputDTO> dtos = new ArrayList<>();
 
@@ -50,16 +51,14 @@ public class UserService implements UserDetailsService {
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
-        UserOutputDTO user = new UserOutputDTO();
-        if (Objects.equals(username, authUsername) || isAdmin) {
-            if (optionalUser.isPresent()) {
-                User existingUser = optionalUser.get();
-                user = userMapper.userToOutput(existingUser);
-            }
-        } else {
+        if (optionalUser.isEmpty()) {
+            throw new RecordNotFoundException("User with username " + username + " not found");
+        }
+        if (!Objects.equals(username, authUsername) || !isAdmin) {
             throw new FailToAuthenticateException("You are not authorized to see profile of user " + username);
         }
-        return user;
+        User existingUser = optionalUser.get();
+        return userMapper.userToOutput(existingUser);
     }
 
     public UserOutputDTO getUserByIdForAdmin(Long id) {
@@ -88,7 +87,6 @@ public class UserService implements UserDetailsService {
             throw new DuplicateRecordException("An account with this e-mailadres already exists");
         }
         User user = userMapper.inputToUser(newUser);
-
         Set<Role> roles = new HashSet<>();
         Role userRole = new Role();
         userRole.setName("ROLE_USER");
@@ -106,19 +104,23 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void deleteUser(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
         Optional<User> optionalWithId = userRepository.findById(id);
-        if(optionalWithId.isEmpty()){
+        if (optionalWithId.isEmpty()) {
             throw new RecordNotFoundException("User not found");
         }
         User withId = optionalWithId.get();
 
-        if(!Objects.equals(withId.getUsername(), username)) {
+        if (!Objects.equals(withId.getUsername(), username)) {
             throw new FailToAuthenticateException("You are not authorized to delete this user");
         }
-        userRepository.deleteById(id);
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_DESIGNER"))) {
+            withId.setEnabled(false);
+        } else {
+            userRepository.deleteById(id);
+        }
     }
 
     @Transactional
@@ -126,12 +128,11 @@ public class UserService implements UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        if(!isAdmin) {
+        if (!isAdmin) {
             throw new FailToAuthenticateException("Authentication for this action failed");
         }
-
         Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User not found");
         }
         User user = optionalUser.get();

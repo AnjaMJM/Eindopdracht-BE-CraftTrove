@@ -2,6 +2,7 @@ package com.crafter.crafttroveapi.controllers;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
+import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.services.DesignerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,15 +39,19 @@ public class DesignerController {
     @PostMapping()
     public ResponseEntity<DesignerOutputDTO> createNewDesigner(@RequestPart("designer") DesignerInputDTO newDesigner, @RequestPart("logo") MultipartFile logo) throws IOException {
 
-        DesignerOutputDTO createdDesigner = designerService.createNewDesigner(newDesigner, logo);
+        try {
+            DesignerOutputDTO createdDesigner = designerService.createNewDesigner(newDesigner, logo);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{name}")
-                .buildAndExpand(createdDesigner.getBrandName())
-                .toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{name}")
+                    .buildAndExpand(createdDesigner.getBrandName())
+                    .toUri();
 
-        return ResponseEntity.created(location).body(createdDesigner);
+            return ResponseEntity.created(location).body(createdDesigner);
+        } catch (DuplicateRecordException ex) {
+            throw new DuplicateRecordException("There already is a designer account assigned");
+        }
     }
 
     @PatchMapping("/{name}")
@@ -55,10 +60,10 @@ public class DesignerController {
         return ResponseEntity.ok(update);
     }
 
-//    @DeleteMapping("/{name}")
-//    public ResponseEntity<String> deleteDesigner(@PathVariable String name) {
-//        setAuthentication(SecurityContextHolder.getContext());
-//        designerService.deleteDesigner(name);
-//        return ResponseEntity.ok("Designer shop successfully deleted");
-//    }
+    @DeleteMapping("/{name}")
+    public ResponseEntity<String> deleteDesigner(@PathVariable String name) {
+
+        designerService.deleteDesigner(name);
+        return ResponseEntity.ok("Designer shop successfully deleted");
+    }
 }

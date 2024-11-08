@@ -20,15 +20,15 @@ public class AuthenticateDesigner {
     }
 
     public Designer designerAuthentication (){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User not found");
         }
         User user = optionalUser.get();
-        if (!user.isDesigner()) {
+        if (auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_DESIGNER"))) {
             throw new RecordNotFoundException("There is no designer account for user " + username);
         }
 

@@ -38,24 +38,27 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/designers").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/designers/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/categories").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/keywords").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, "/users").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/users/**").authenticated()
 
+                                .requestMatchers(HttpMethod.POST, "/designers").hasAuthority("ROLE_USER")
                                 .requestMatchers(HttpMethod.POST, "/purchase").hasAuthority("ROLE_USER")
                                 .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
-                                .requestMatchers(HttpMethod.POST, "/designers").hasAuthority("ROLE_USER")
-                                .requestMatchers(HttpMethod.PATCH, "/designers/**").hasAuthority("ROLE_DESIGNER")
-
                                 .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ROLE_USER")
-                                .requestMatchers(HttpMethod.DELETE, "/users/admin/**").hasAuthority("ROLE_ADMIN")
+
+                                .requestMatchers(HttpMethod.DELETE, "/designers/**").hasAuthority("ROLE_DESIGNER")
+
+                                .requestMatchers(HttpMethod.PATCH, "/designers/**").hasAuthority("ROLE_DESIGNER")
                                 .requestMatchers(HttpMethod.DELETE, "/products/**").hasAuthority("ROLE_DESIGNER")
+
                                 .requestMatchers(HttpMethod.DELETE, "/users/admin/**").hasAuthority("ROLE_ADMIN")
-//                                .requestMatchers(HttpMethod.DELETE, "/designers/**").hasAuthority("ROLE_DESIGNER")
+                                .requestMatchers(HttpMethod.DELETE, "/users/admin/**").hasAuthority("ROLE_ADMIN")
 
                                 .requestMatchers("/products/**").hasAuthority("ROLE_DESIGNER")
-                                .requestMatchers("/designers").hasAnyAuthority("ROLE_DESIGNER")
+                                .requestMatchers("/designers").hasAuthority("ROLE_DESIGNER")
 
                                 .anyRequest().denyAll()
 

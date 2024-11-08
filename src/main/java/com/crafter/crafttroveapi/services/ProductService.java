@@ -83,21 +83,8 @@ public class ProductService {
 
     @Transactional
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.isDesigner()) {
-                Designer designer = user.getDesigner();
-                newProduct.setDesigner(designer);
-            } else {
-                throw new RecordNotFoundException("There is no designer account for user " + username);
-            }
-        } else {
-            throw new RecordNotFoundException("User not found");
-        }
+        Designer designer = authDesigner.designerAuthentication();
+        newProduct.setDesigner(designer);
         if (productRepository.existsByTitleIgnoreCase(newProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
@@ -134,7 +121,7 @@ public class ProductService {
             throw new RecordNotFoundException("This product does not exist in your shop or is already set to unavailable");
         }
         Product existingProduct = product.get();
-        if(!existingProduct.getIsAvailable()) {
+        if (!existingProduct.getIsAvailable()) {
             throw new ConflictWithResourceStateException("This product is already unavailable");
         }
 
@@ -154,7 +141,7 @@ public class ProductService {
             throw new RecordNotFoundException("This product does not exist");
         }
         Product existingProduct = product.get();
-        if(!existingProduct.getIsAvailable()) {
+        if (!existingProduct.getIsAvailable()) {
             throw new ConflictWithResourceStateException("This product is already unavailable");
         }
         existingProduct.setIsAvailable(false);
