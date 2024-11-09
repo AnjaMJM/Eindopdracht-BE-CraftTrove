@@ -49,14 +49,12 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/products/*/review").hasAuthority("ROLE_USER")
                                 .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ROLE_USER")
 
-                                .requestMatchers(HttpMethod.DELETE, "/designers/**").hasAuthority("ROLE_DESIGNER")
+                                .requestMatchers(HttpMethod.DELETE, "/users/admin/**").hasAuthority("ROLE_ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/products/admin/**").hasAuthority("ROLE_ADMIN")
 
+                                .requestMatchers(HttpMethod.DELETE, "/designers/**").hasAuthority("ROLE_DESIGNER")
                                 .requestMatchers(HttpMethod.PATCH, "/designers/**").hasAuthority("ROLE_DESIGNER")
                                 .requestMatchers(HttpMethod.DELETE, "/products/**").hasAuthority("ROLE_DESIGNER")
-
-                                .requestMatchers(HttpMethod.DELETE, "/users/admin/**").hasAuthority("ROLE_ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/users/admin/**").hasAuthority("ROLE_ADMIN")
-
                                 .requestMatchers("/products/**").hasAuthority("ROLE_DESIGNER")
                                 .requestMatchers("/designers").hasAuthority("ROLE_DESIGNER")
 

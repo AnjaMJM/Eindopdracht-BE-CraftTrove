@@ -48,13 +48,12 @@ public class UserService implements UserDetailsService {
     public UserOutputDTO getUserByUsername(String username) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authUsername = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User with username " + username + " not found");
         }
-        if (!Objects.equals(username, authUsername) || !isAdmin) {
+        if (!Objects.equals(username, authUsername)) {
             throw new FailToAuthenticateException("You are not authorized to see profile of user " + username);
         }
         User existingUser = optionalUser.get();
