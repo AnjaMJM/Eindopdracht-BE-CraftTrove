@@ -11,7 +11,7 @@ public class ReviewMapper {
 
     private final ProductMapper productMapper;
 
-    public ReviewMapper(ProductMapper productMapper, UserMapper userMapper) {
+    public ReviewMapper(ProductMapper productMapper) {
         this.productMapper = productMapper;
     }
 
@@ -29,7 +29,6 @@ public class ReviewMapper {
 
     public Review inputToReview(ReviewInputDTO inputDTO) {
         Review review = new Review();
-
         review.setProduct(inputDTO.getProduct());
         review.setText(inputDTO.getReviewText());
         review.setRating(inputDTO.getRating());

@@ -11,9 +11,4 @@ public class RoleDTO {
 
     private boolean active;
 
-    public RoleDTO(String name) {
-    }
-
-    public RoleDTO() {
-    }
 }

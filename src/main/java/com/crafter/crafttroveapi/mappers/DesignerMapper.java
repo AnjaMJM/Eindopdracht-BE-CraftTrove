@@ -12,8 +12,6 @@ import java.util.List;
 @Service
 public class DesignerMapper {
 
-
-
     public DesignerOutputDTO designerToOutput(Designer designer){
         DesignerOutputDTO dto = new DesignerOutputDTO();
         dto.setUsername(designer.getUser().getUsername());
@@ -39,17 +37,5 @@ public class DesignerMapper {
         designer.setBrandLogo(inputDTO.getLogo());
         designer.setBrandDescription(inputDTO.getBrandDescription());
         return designer;
-    }
-
-    public List<DesignerOutputDTO> listDesignerToOutput(List<Designer> d) {
-        List<Designer> designers = new ArrayList<>(d);
-        List<DesignerOutputDTO> outputList = new ArrayList<>();
-
-        for (Designer designer : designers) {
-            DesignerOutputDTO output = designerToOutput(designer);
-
-                outputList.add(output);
-            }
-        return outputList;
     }
 }

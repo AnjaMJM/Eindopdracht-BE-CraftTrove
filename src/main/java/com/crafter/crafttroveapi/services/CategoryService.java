@@ -6,14 +6,15 @@ import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.helpers.CheckType;
 import com.crafter.crafttroveapi.mappers.CategoryMapper;
 import com.crafter.crafttroveapi.models.Category;
-import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.repositories.CategoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;

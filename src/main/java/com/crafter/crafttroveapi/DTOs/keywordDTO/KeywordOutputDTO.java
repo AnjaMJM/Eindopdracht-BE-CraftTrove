@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class KeywordOutputDTO {
+
     private String name;
     private List<Long> productIdList;
 }

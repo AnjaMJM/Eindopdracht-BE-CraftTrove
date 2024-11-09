@@ -17,7 +17,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserInputDTO {
 
-    @NotEmpty(message = "Please enter a username, with at least 4 characters and maximum 20 charachters")
+    @NotEmpty(message = "Please enter a username, with at least 4 characters and maximum 20 characters")
     @Min(value = 4, message = "Your username needs at least 4 characters")
     @Max(value = 20, message = "Your username can have maximum 20 characters")
     private String username;

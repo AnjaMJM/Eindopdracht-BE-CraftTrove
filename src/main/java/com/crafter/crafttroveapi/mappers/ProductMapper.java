@@ -2,7 +2,6 @@ package com.crafter.crafttroveapi.mappers;
 
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductPatchInputDTO;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.models.Keyword;
 import com.crafter.crafttroveapi.models.Product;
@@ -19,9 +18,7 @@ import java.util.List;
 public class ProductMapper {
 
     private final CategoryRepository categoryRepository;
-
     private final KeywordRepository keywordRepository;
-
     private final DesignerMapper designerMapper;
 
     @Autowired
@@ -68,38 +65,6 @@ public class ProductMapper {
 
     public Product inputToProduct(ProductInputDTO inputDTO) {
         Product product = new Product();
-
-        product.setTitle(inputDTO.getTitle());
-        product.setDescription(inputDTO.getDescription());
-        product.setPrice(inputDTO.getPrice());
-        product.setIsAvailable(inputDTO.getIsAvailable());
-        product.setThumbnail(inputDTO.getThumbnail());
-        product.setPhotos(inputDTO.getPhotos());
-        product.setPatternFile(inputDTO.getPattern());
-        product.setDesigner(inputDTO.getDesigner());
-        if (inputDTO.getCategoryList() != null) {
-            List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(inputDTO.getCategoryList());
-            product.setCategories(categories);
-        }
-        if (inputDTO.getKeywordList() != null) {
-            List<Keyword> keywords = new ArrayList<>();
-            for (String keywordName : inputDTO.getKeywordList()) {
-                Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
-                        .orElseGet(() -> {
-                            Keyword newKeyword = new Keyword();
-                            newKeyword.setName(keywordName);
-                            return keywordRepository.save(newKeyword);
-                        });
-                keywords.add(keyword);
-            }
-            product.setKeywords(keywords);
-        }
-        return product;
-    }
-
-    public Product patchToProduct(ProductPatchInputDTO inputDTO) {
-        Product product = new Product();
-
         product.setTitle(inputDTO.getTitle());
         product.setDescription(inputDTO.getDescription());
         product.setPrice(inputDTO.getPrice());
@@ -140,49 +105,5 @@ public class ProductMapper {
         }
         return outputList;
     }
-
-//    public Product UpdatedInputToProduct(ProductInputDTO updatedInput) {
-//        Optional<Product> product = productRepository.findById(id);
-//        if (product.isPresent()) {
-//            Product existingProduct = product.get();
-//
-//            if (updatedInput.getTitle() != null) {
-//                existingProduct.setTitle(updatedInput.getTitle());
-//            }
-//            if (updatedInput.getDescription() != null) {
-//                existingProduct.setDescription(updatedInput.getDescription());
-//            }
-//            if (updatedInput.getPrice() != null) {
-//                existingProduct.setPrice(updatedInput.getPrice());
-//            }
-//            if (updatedInput.getThumbnail() != null) {
-//                existingProduct.setThumbnail(updatedInput.getThumbnail());
-//            }
-//            if (updatedInput.getPhotos() != null) {
-//                existingProduct.setPhotos(updatedInput.getPhotos());
-//            }
-//            if (updatedInput.getPattern() != null) {
-//                existingProduct.setPattern(updatedInput.getPattern());
-//            }
-//            if (updatedInput.getCategoryList() != null) {
-//                List<Category> categories = categoryRepository.findByNameIgnoreCaseIn(updatedInput.getCategoryList());
-//                existingProduct.setCategories(categories);
-//            }
-//            if (updatedInput.getKeywordList() != null) {
-//                List<Keyword> keywords = new ArrayList<>();
-//                for (String keywordName : updatedInput.getKeywordList()) {
-//                    Keyword keyword = keywordRepository.findByNameIgnoreCase(keywordName)
-//                            .orElseGet(() -> {
-//                                Keyword newKeyword = new Keyword();
-//                                newKeyword.setName(keywordName);
-//                                return keywordRepository.save(newKeyword);
-//                            });
-//                    keywords.add(keyword);
-//                }
-//                existingProduct.setKeywords(keywords);
-//            }
-//            if (updatedInput.getIsAvailable() != null) {
-//                existingProduct.setIsAvailable(updatedInput.getIsAvailable());
-//            }
 }
 

@@ -3,13 +3,14 @@ package com.crafter.crafttroveapi.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.FORBIDDEN)
-public class DuplicateRecordException extends RuntimeException{
-    public DuplicateRecordException() {
+@ResponseStatus(HttpStatus.CONFLICT)
+public class ConflictWithResourceStateException extends RuntimeException{
+
+    public ConflictWithResourceStateException() {
         super("A record with the same title already exists.");
     }
 
-    public DuplicateRecordException(String message) {
+    public ConflictWithResourceStateException(String message) {
         super(message);
     }
 }

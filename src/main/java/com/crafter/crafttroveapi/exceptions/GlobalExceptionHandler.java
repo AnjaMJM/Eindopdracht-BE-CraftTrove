@@ -74,4 +74,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorObject, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(value = ConflictWithResourceStateException.class)
+    public ResponseEntity<ErrorObject> handleConflictWithResource(ConflictWithResourceStateException exception) {
+        ErrorObject errorObject = new ErrorObject();
+
+        errorObject.setStatusCode(HttpStatus.CONFLICT.value());
+        errorObject.setMessage(exception.getMessage());
+        errorObject.setTimestamp(new Date());
+
+        return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
+    }
 }

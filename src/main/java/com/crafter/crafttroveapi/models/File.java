@@ -27,14 +27,6 @@ public class File {
     private long size;
 
     @OneToOne(mappedBy = "brandLogo")
-    private Designer designer; //mapped
+    private Designer designer;
 
-//    @OneToOne(mappedBy = "thumbnail")
-//    private Product product;
-//
-//    @OneToOne(mappedBy = "patternFile")
-//    private Product pattern;
-
-//    @ManyToOne
-//    private Product photos;
 }

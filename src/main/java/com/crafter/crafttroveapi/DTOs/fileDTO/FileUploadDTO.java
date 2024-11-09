@@ -16,11 +16,8 @@ public class FileUploadDTO {
     private byte[] fileData;
     @NotNull
     private String url;
-
     private String contentType;
-
     private long size;
-
     private Designer designer;
-//    private Product product;
+
 }

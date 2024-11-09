@@ -1,14 +1,15 @@
 package com.crafter.crafttroveapi.services;
 
-import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.DTOs.reviewDTO.ReviewInputDTO;
 import com.crafter.crafttroveapi.DTOs.reviewDTO.ReviewOutputDTO;
+import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
 import com.crafter.crafttroveapi.mappers.ReviewMapper;
 import com.crafter.crafttroveapi.models.Product;
 import com.crafter.crafttroveapi.models.Review;
 import com.crafter.crafttroveapi.models.User;
 import com.crafter.crafttroveapi.repositories.ProductRepository;
+import com.crafter.crafttroveapi.repositories.PurchaseRepository;
 import com.crafter.crafttroveapi.repositories.ReviewRepository;
 import com.crafter.crafttroveapi.repositories.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -19,14 +20,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,23 +31,21 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-//@WebMvcTest -> voor controller testen
 class ReviewServiceTest {
 
-    @Mock //mocks a dependency
-    ReviewRepository reviewRepository;
+    @InjectMocks
+    ReviewService service;
 
     @Mock
-    UserRepository userRepository;
-
-    @Mock
-    ProductRepository productRepository;
-
+    ReviewRepository repository;
     @Mock
     ReviewMapper mapper;
-
-    @InjectMocks // code that needs to be tested
-    ReviewService service;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    ProductRepository productRepository;
+    @Mock
+    PurchaseRepository purchaseRepository;
 
     private Authentication authentication;
     private User user;
@@ -61,7 +56,6 @@ class ReviewServiceTest {
 
     @BeforeEach
     void setUp() {
-
         authentication = Mockito.mock(Authentication.class);
         Mockito.when(authentication.getName()).thenReturn("mockUser");
 
@@ -70,6 +64,7 @@ class ReviewServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         user = new User();
+        user.setId(1L);
         user.setUsername(authentication.getName());
 
         product = new Product();
@@ -94,42 +89,52 @@ class ReviewServiceTest {
     }
 
     @Test
-    void createReview() {
+    void canCreateReview() {
         //arrange
         when(mapper.inputToReview(any())).thenReturn(review);
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(reviewRepository.save(review)).thenReturn(review);
+        when(purchaseRepository.existsByUserIdAndProductIdAndIsPayedTrue(1L, 1L)).thenReturn(true);
+        when(productRepository.findByIdAndIsAvailable(1L)).thenReturn(Optional.of(product));
+        when(repository.save(review)).thenReturn(review);
         when(mapper.reviewToOutput(any())).thenReturn(output);
         //act
-        ReviewOutputDTO dto = service.createReview(input, 1L);
+        ReviewOutputDTO dto = service.createReview(1L, input);
         //assert
         assertEquals(review.getText(), dto.getReviewText());
         assertEquals(user.getUsername(), output.getUsername());
     }
 
     @Test
-    void userNotFoundTest() {
+    void canNotFindUser() {
         //arrange
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         //act
-
         //assert
-        assertThrows(RecordNotFoundException.class, ()-> service.createReview(input, 1L));
+        assertThrows(RecordNotFoundException.class, ()-> service.createReview(1L, input));
     }
 
     @Test
-    void productNotFoundTest() {
+    void canNotFindProductInPurchase() {
         //arrange
         when(mapper.inputToReview(any())).thenReturn(review);
-        when(productRepository.findById(2L)).thenReturn(Optional.empty());
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(purchaseRepository.existsByUserIdAndProductIdAndIsPayedTrue(1L, 1L)).thenReturn(false);
+        //act
+        //assert
+        assertThrows(FailToAuthenticateException.class, ()-> service.createReview(1L, input));
+    }
 
+    @Test
+    void canNotFindUnavailableProduct() {
+        //arrange
+        when(mapper.inputToReview(any())).thenReturn(review);
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(purchaseRepository.existsByUserIdAndProductIdAndIsPayedTrue(1L, 2L)).thenReturn(true);
+        when(productRepository.findByIdAndIsAvailable(2L)).thenReturn(Optional.empty());
         // act
 
         //assert
-        assertThrows(RecordNotFoundException.class, ()-> service.createReview(input, 2L));
+        assertThrows(RecordNotFoundException.class, ()-> service.createReview(2L, input));
     }
 
 }
