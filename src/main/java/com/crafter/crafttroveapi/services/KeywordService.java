@@ -3,6 +3,7 @@ package com.crafter.crafttroveapi.services;
 import com.crafter.crafttroveapi.DTOs.keywordDTO.KeywordOutputDTO;
 import com.crafter.crafttroveapi.models.Keyword;
 import com.crafter.crafttroveapi.repositories.KeywordRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 import static com.crafter.crafttroveapi.mappers.KeywordMapper.KeywordToOutput;
 
 @Service
+@Transactional
 public class KeywordService {
 
     private final KeywordRepository keywordRepository;

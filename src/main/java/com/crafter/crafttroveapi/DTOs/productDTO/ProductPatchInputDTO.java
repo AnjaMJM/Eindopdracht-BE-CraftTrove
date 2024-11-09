@@ -11,22 +11,13 @@ import java.util.List;
 public class ProductPatchInputDTO {
 
     private Designer designer;
-
     private String title;
-
     private String description;
-
     private Double price;
-
     private String thumbnail;
-
     private List<String> photos;
-
     private String pattern;
-
     private List<String> categoryList;
-
     private List<String> keywordList;
-
     private Boolean isAvailable;
 }

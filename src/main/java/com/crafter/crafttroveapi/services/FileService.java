@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class FileService {
 
     private final FileRepository fileRepository;
@@ -19,7 +20,6 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    @Transactional
     public File uploadLogo (MultipartFile file) throws IOException {
         String uniqueUrl = UUID.randomUUID().toString();
 
@@ -33,7 +33,6 @@ public class FileService {
         return fileRepository.save(logo);
     }
 
-    @Transactional
     public Optional<File> getPhotoByUniqueUrl(String uniqueUrl) {
         return fileRepository.findByUrl(uniqueUrl);
     }

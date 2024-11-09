@@ -59,11 +59,4 @@ public class DesignerController {
         DesignerOutputDTO update = designerService.updateDesigner(name, updatedDesigner);
         return ResponseEntity.ok(update);
     }
-
-    @DeleteMapping("/{name}")
-    public ResponseEntity<String> deleteDesigner(@PathVariable String name) {
-
-        designerService.deleteDesigner(name);
-        return ResponseEntity.ok("Designer shop successfully deleted");
-    }
 }

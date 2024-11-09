@@ -2,7 +2,6 @@ package com.crafter.crafttroveapi.mappers;
 
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerInputDTO;
 import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerOutputDTO;
-import com.crafter.crafttroveapi.DTOs.designerDTO.DesignerPatchInputDTO;
 import com.crafter.crafttroveapi.models.Designer;
 import com.crafter.crafttroveapi.models.Product;
 import org.springframework.stereotype.Service;
@@ -38,25 +37,5 @@ public class DesignerMapper {
         designer.setBrandLogo(inputDTO.getLogo());
         designer.setBrandDescription(inputDTO.getBrandDescription());
         return designer;
-    }
-
-    public Designer patchInputT0Designer(DesignerPatchInputDTO patchInputDTO) {
-        Designer designer = new Designer();
-        designer.setBrandName(patchInputDTO.getBrandName());
-        designer.setBrandLogo(patchInputDTO.getLogo());
-        designer.setBrandDescription(patchInputDTO.getBrandDescription());
-        return designer;
-    }
-
-    public List<DesignerOutputDTO> listDesignerToOutput(List<Designer> d) {
-        List<Designer> designers = new ArrayList<>(d);
-        List<DesignerOutputDTO> outputList = new ArrayList<>();
-
-        for (Designer designer : designers) {
-            DesignerOutputDTO output = designerToOutput(designer);
-
-                outputList.add(output);
-            }
-        return outputList;
     }
 }

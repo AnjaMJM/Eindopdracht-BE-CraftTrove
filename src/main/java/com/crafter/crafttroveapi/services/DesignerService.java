@@ -57,8 +57,14 @@ public class DesignerService {
     }
 
     public DesignerOutputDTO createNewDesigner(DesignerInputDTO newDesigner, MultipartFile logo) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_DESIGNER"))) {
+            throw new DuplicateRecordException("User " + username + "already has a designer account");
+        }
+
 
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
@@ -87,7 +93,7 @@ public class DesignerService {
     public DesignerOutputDTO updateDesigner(String name, DesignerInputDTO updatedDesigner) {
         Designer designer = authDesigner.designerAuthentication();
 
-        if (!Objects.equals(designer.getBrandName(), name)) {
+        if (!designer.getBrandName().equalsIgnoreCase(name)) {
             throw new FailToAuthenticateException("Authentication and requested brand do not match. Check is case sensitive");
         }
         if (designerRepository.existsByBrandNameIgnoreCase(updatedDesigner.getBrandName())) {
@@ -95,22 +101,7 @@ public class DesignerService {
         }
 
         BeanUtils.copyProperties(updatedDesigner, designer, PatchHelper.getNullPropertyNames(updatedDesigner));
-
         Designer savedDesigner = designerRepository.save(designer);
-
         return designerMapper.designerToOutput(savedDesigner);
-    }
-
-    public void deleteDesigner(String name) {
-        Optional<Designer> optionalDesigner = designerRepository.findDesignerByBrandNameIgnoreCase(name);
-        if (optionalDesigner.isEmpty()) {
-            throw new RecordNotFoundException("Brand " + name + " is not found");
-        }
-        Designer designer = optionalDesigner.get();
-        List<Product> products = optionalDesigner.get().getProducts();
-        for (Product product : products) {
-            product.setIsAvailable(false);
-        }
-        designerRepository.delete(designer);
     }
 }

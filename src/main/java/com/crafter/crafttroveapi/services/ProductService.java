@@ -26,24 +26,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
+@Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final KeywordRepository keywordRepository;
     private final ProductMapper productMapper;
-    private final UserRepository userRepository;
     private final AuthenticateDesigner authDesigner;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, UserRepository userRepository, AuthenticateDesigner authDesigner) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, KeywordRepository keywordRepository, ProductMapper productMapper, AuthenticateDesigner authDesigner) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.keywordRepository = keywordRepository;
         this.productMapper = productMapper;
-        this.userRepository = userRepository;
         this.authDesigner = authDesigner;
     }
 
@@ -81,7 +79,6 @@ public class ProductService {
         return productMapper.ListProductToOutput(keyword.getProducts());
     }
 
-    @Transactional
     public ProductOutputDTO createNewProduct(ProductInputDTO newProduct) {
         Designer designer = authDesigner.designerAuthentication();
         newProduct.setDesigner(designer);
@@ -92,14 +89,12 @@ public class ProductService {
         return productMapper.productToOutput(p);
     }
 
-    @Transactional
     public ProductOutputDTO updateProduct(Long id, ProductPatchInputDTO updatedProduct) {
         Designer designer = authDesigner.designerAuthentication();
         Optional<Product> product = productRepository.findByIdAndDesigner(id, designer);
         if (product.isEmpty()) {
             throw new RecordNotFoundException("This product does not exist in your shop");
         }
-
         if (productRepository.existsByTitleIgnoreCase(updatedProduct.getTitle())) {
             throw new DuplicateRecordException("A product with this name already exists");
         }
@@ -108,11 +103,9 @@ public class ProductService {
         BeanUtils.copyProperties(updatedProduct, existingProduct, PatchHelper.getNullPropertyNames(updatedProduct));
 
         Product savedProduct = productRepository.save(existingProduct);
-
         return productMapper.productToOutput(savedProduct);
     }
 
-    @Transactional
     public void deleteProductByDesigner(Long id) {
         Designer designer = authDesigner.designerAuthentication();
 
@@ -128,14 +121,12 @@ public class ProductService {
         existingProduct.setIsAvailable(false);
     }
 
-    @Transactional
     public void deleteProductByAdmin(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         if (!isAdmin) {
             throw new FailToAuthenticateException("Authentication for this action failed");
         }
-
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty()) {
             throw new RecordNotFoundException("This product does not exist");

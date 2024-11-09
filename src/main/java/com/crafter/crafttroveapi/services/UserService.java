@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Transactional
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -35,7 +36,6 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserOutputDTO> getAllUsers() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<User> users = userRepository.findAll();
         List<UserOutputDTO> dtos = new ArrayList<>();
 
@@ -66,19 +66,16 @@ public class UserService implements UserDetailsService {
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         Optional<User> optionalUser = userRepository.findById(id);
-
         if (optionalUser.isEmpty()) {
             throw new RecordNotFoundException("User not found");
         }
         User existingUser = optionalUser.get();
-
         if (!isAdmin) {
             throw new FailToAuthenticateException("You are not authorized to see this user profile");
         }
         return userMapper.userToOutput(existingUser);
     }
 
-    @Transactional
     public UserOutputDTO createNewUser(UserInputDTO newUser) {
         if (userRepository.existsByUsername(newUser.getUsername())) {
             throw new DuplicateRecordException("This username is already taken");
@@ -102,7 +99,6 @@ public class UserService implements UserDetailsService {
         return userMapper.userToOutput(createdUser);
     }
 
-    @Transactional
     public void deleteUser(Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -123,7 +119,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    @Transactional
     public void deactivateUserByAdmin(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));

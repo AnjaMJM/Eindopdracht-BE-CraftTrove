@@ -17,10 +17,9 @@ public class ApiUserDetails implements UserDetails {
         this.user = user;
     }
 
-    public ApiUserDetails(String username, List<String> roles, String organisation) {
+    public ApiUserDetails(String username, List<String> roles) {
         user = new User();
         user.setUsername(username);
-
         for (String role : roles) {
             user.getRoles().add(new Role(role));
         }

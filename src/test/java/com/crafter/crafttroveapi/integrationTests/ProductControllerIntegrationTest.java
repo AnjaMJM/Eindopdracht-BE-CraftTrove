@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -43,7 +44,10 @@ public class ProductControllerIntegrationTest {
                         .contentType(APPLICATION_JSON)
                         .content(requestJson))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isCreated());
-
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(jsonPath("title").value("Pretty lace doyle"))
+                .andExpect(jsonPath("price").value(9.99))
+                .andExpect(jsonPath("isAvailable").isBoolean())
+                .andExpect(jsonPath("keywordList").isArray());
     }
 }

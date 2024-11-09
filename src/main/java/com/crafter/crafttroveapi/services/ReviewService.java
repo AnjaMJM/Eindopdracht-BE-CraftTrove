@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -40,7 +41,6 @@ public class ReviewService {
         this.reviewMapper = reviewMapper;
     }
 
-    @Transactional
     @CheckAvailability
     public ReviewOutputDTO createReview(Long productId, ReviewInputDTO newReview) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

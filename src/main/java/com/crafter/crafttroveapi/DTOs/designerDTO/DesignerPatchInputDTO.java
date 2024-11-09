@@ -9,8 +9,6 @@ import lombok.Setter;
 public class DesignerPatchInputDTO {
 
     private String brandName;
-
     private File logo;
-
     private String brandDescription;
 }

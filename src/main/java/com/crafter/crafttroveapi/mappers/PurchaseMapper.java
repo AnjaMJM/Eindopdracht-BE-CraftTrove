@@ -15,13 +15,10 @@ import java.util.List;
 public class PurchaseMapper {
 
     private final ProductRepository productRepository;
-    private final UserMapper userMapper;
 
-    public PurchaseMapper(ProductRepository productRepository, UserMapper userMapper) {
+    public PurchaseMapper(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.userMapper = userMapper;
     }
-
 
     public PurchaseOutputDTO purchaseToOutput(Purchase purchase) {
         PurchaseOutputDTO dto = new PurchaseOutputDTO();

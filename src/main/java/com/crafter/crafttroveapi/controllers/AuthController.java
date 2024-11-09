@@ -7,6 +7,7 @@ import com.crafter.crafttroveapi.exceptions.FailToAuthenticateException;
 import com.crafter.crafttroveapi.security.ApiUserDetails;
 import com.crafter.crafttroveapi.security.JwtService;
 import com.crafter.crafttroveapi.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserService userService;
 
+    @Autowired
     public AuthController(AuthenticationManager man, JwtService service, UserService userService) {
         this.authManager = man;
         this.jwtService = service;

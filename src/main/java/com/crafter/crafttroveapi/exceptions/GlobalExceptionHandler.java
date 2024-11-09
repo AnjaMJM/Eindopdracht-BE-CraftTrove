@@ -39,11 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorObject> handleDuplicateRecordException(DuplicateRecordException exception) {
         ErrorObject errorObject = new ErrorObject();
 
-        errorObject.setStatusCode(HttpStatus.FORBIDDEN.value());
+        errorObject.setStatusCode(HttpStatus.CONFLICT.value());
         errorObject.setMessage(exception.getMessage());
         errorObject.setTimestamp(new Date());
 
-        return new ResponseEntity<>(errorObject, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

@@ -17,17 +17,22 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-
 @Aspect
 @Component
 public class ProductAvailabilityAspect {
 
+    private final ProductRepository productRepository;
+
+    private final KeywordRepository keywordRepository;
+
+    private final CategoryRepository categoryRepository;
+
     @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private KeywordRepository keywordRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
+    public ProductAvailabilityAspect(ProductRepository productRepository, KeywordRepository keywordRepository, CategoryRepository categoryRepository) {
+        this.productRepository = productRepository;
+        this.keywordRepository = keywordRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Before(value = "@annotation(com.crafter.crafttroveapi.annotations.CheckAvailability) && args(productId,..)")
     public void checkProductAvailability(Long productId) {
@@ -55,8 +60,6 @@ public class ProductAvailabilityAspect {
             if (!hasAvailableProducts) {
                 throw new RecordNotFoundException("No available products for category: " + name);
             }
-
-
         } else {
             Keyword keyword = keywordRepository.findByNameIgnoreCase(name)
                     .orElseThrow(() -> new RecordNotFoundException("Keyword " + name + " is not found"));

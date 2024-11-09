@@ -13,7 +13,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Enumerated(EnumType.STRING)
     private String name;
 
     @Column(columnDefinition = "boolean default true")

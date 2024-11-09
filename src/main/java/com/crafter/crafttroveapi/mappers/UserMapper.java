@@ -1,7 +1,6 @@
 package com.crafter.crafttroveapi.mappers;
 
 import com.crafter.crafttroveapi.DTOs.userDTO.UserInputDTO;
-import com.crafter.crafttroveapi.DTOs.userDTO.UserLoginRequestDTO;
 import com.crafter.crafttroveapi.DTOs.userDTO.UserOutputDTO;
 import com.crafter.crafttroveapi.models.Category;
 import com.crafter.crafttroveapi.models.Product;
@@ -25,7 +24,6 @@ public class UserMapper {
         this.roleMapper = roleMapper;
         this.passwordEncoder = passwordEncoder;
     }
-
     public UserOutputDTO userToOutput(User user) {
         UserOutputDTO dto = new UserOutputDTO();
         dto.setId(user.getId());
@@ -72,18 +70,4 @@ public class UserMapper {
         user.setRoles(roleMapper.listInputToRoles(inputDTO.getRoles()));
         return user;
     }
-
-    public User requestInputToUser(UserLoginRequestDTO loginDTO) {
-        User result = new User();
-        result.setUsername(loginDTO.getUsername());
-        result.setPassword(loginDTO.getPassword());
-        return result;
-    }
-
-//    public UserModel mapToModel(UserChangePassWordRequestDTO userDTO, Long id) {
-//        var result = new UserModel(id);
-//        result.setPassword(userDTO.getPassword());
-//        return result;
-//    }
-
 }

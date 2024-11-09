@@ -4,6 +4,7 @@ import com.crafter.crafttroveapi.DTOs.productDTO.ProductInputDTO;
 import com.crafter.crafttroveapi.DTOs.productDTO.ProductOutputDTO;
 import com.crafter.crafttroveapi.exceptions.DuplicateRecordException;
 import com.crafter.crafttroveapi.exceptions.RecordNotFoundException;
+import com.crafter.crafttroveapi.helpers.AuthenticateDesigner;
 import com.crafter.crafttroveapi.mappers.ProductMapper;
 import com.crafter.crafttroveapi.models.*;
 import com.crafter.crafttroveapi.repositories.*;
@@ -46,11 +47,13 @@ class ProductServiceTest {
     KeywordRepository keywordRepository;
     @Mock
     UserRepository userRepository;
-
+    @Mock
+    AuthenticateDesigner authDesigner;
 
     private Authentication authentication;
     private SecurityContext securityContext;
     private User user;
+    private Designer designer = new Designer();
     private Product item1;
     private Product item2;
     private Product item3;
@@ -71,6 +74,8 @@ class ProductServiceTest {
         user = new User();
         user.setUsername("mockUser");
         user.setDesigner(true);
+
+
 
         item1 = new Product();
         item1.setId(1L);
@@ -192,9 +197,7 @@ class ProductServiceTest {
     @WithMockUser
     void canCreateProduct() {
         //Arrange
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn("mockUser");
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(authDesigner.designerAuthentication()).thenReturn(designer);
         when(mapper.inputToProduct(inputDto)).thenReturn(item1);
         when(repository.save(item1)).thenReturn(item1);
         when(mapper.productToOutput(item1)).thenReturn(outputDto);
@@ -211,9 +214,7 @@ class ProductServiceTest {
     @WithMockUser
     void checkTitleDuplicity() {
         //Arrange
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn("mockUser");
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(authDesigner.designerAuthentication()).thenReturn(designer);
         when(repository.existsByTitleIgnoreCase("fun pattern")).thenThrow(DuplicateRecordException.class);
         //Act
         //Assert

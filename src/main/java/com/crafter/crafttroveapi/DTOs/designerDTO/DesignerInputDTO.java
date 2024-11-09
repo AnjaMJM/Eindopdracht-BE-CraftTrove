@@ -11,11 +11,8 @@ import lombok.Setter;
 public class DesignerInputDTO {
 
     private User user;
-
     @NotEmpty(message = "Your brand needs a name.")
     private String brandName;
-
     private File logo;
-
     private String brandDescription;
 }
